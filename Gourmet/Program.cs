@@ -13,11 +13,13 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+var db = new Gourmet.Database.AppDatabaseContext();
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-app.MapGet("/get-all-products", async () => await Gourmet.Database.ProductsRepository.GetProductsAsync())
+app.MapGet("/get-all-products", async () => await Gourmet.Database.ProductsRepository.GetProductsAsync(db))
     .WithTags("Products Endpoints");
 
 app.MapControllerRoute(

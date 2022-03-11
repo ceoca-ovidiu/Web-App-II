@@ -4,74 +4,60 @@ namespace Gourmet.Database
 {
     internal static class ProductsRepository
     {
-        internal async static Task<List<Products>> GetProductsAsync()
+        internal async static Task<List<Products>> GetProductsAsync(AppDatabaseContext db)
         {
-            using (var db = new AppDatabaseContext())
+            Console.WriteLine("Calling GetProductsAsync from ProductRepository");
+            Console.WriteLine(db.ProductsDbSet.ToListAsync());
+            return await db.ProductsDbSet.ToListAsync();
+        }
+
+        internal async static Task<Products> GetProductsByIdAsync(int productId, AppDatabaseContext db)
+        {
+            return await db.ProductsDbSet.FirstOrDefaultAsync(products => products.ProductId == productId);
+        }
+
+        internal async static Task<bool> CreateProductAsync(Products productToCreate, AppDatabaseContext db)
+        {
+            try
             {
-                return await db.Products.ToListAsync();
+                await db.ProductsDbSet.AddAsync(productToCreate);
+
+                return await db.SaveChangesAsync() >= 1;
+            }
+            catch (Exception e)
+            {
+                return false;
             }
         }
 
-        internal async static Task<Products> GetProductsByIdAsync(int productId)
+        internal async static Task<bool> UpdateProductAsync(Products productToUpdate, AppDatabaseContext db)
         {
-            using (var db = new AppDatabaseContext())
+            try
             {
-                return await db.Products.FirstOrDefaultAsync(products => products.ProductId == productId);
+                db.ProductsDbSet.Update(productToUpdate);
+
+                return await db.SaveChangesAsync() >= 1;
+            }
+            catch (Exception e)
+            {
+                return false;
             }
         }
 
-        internal async static Task<bool> CreatePostAsync(Products productToCreate)
+        internal async static Task<bool> DeleteProductAsync(int productId, AppDatabaseContext db)
         {
-            using (var db = new AppDatabaseContext())
+            try
             {
-                try
-                {
-                    await db.Products.AddAsync(productToCreate);
+                Products productToDelete = await GetProductsByIdAsync(productId, db);
 
-                    return await db.SaveChangesAsync() >= 1;
-                }
-                catch (Exception e)
-                {
-                    return false;
-                }
+                db.Remove(productToDelete);
+
+                return await db.SaveChangesAsync() >= 1;
+            }
+            catch (Exception e)
+            {
+                return false;
             }
         }
-
-        internal async static Task<bool> UpdatePostAsync(Products productToUpdate)
-        {
-            using (var db = new AppDatabaseContext())
-            {
-                try
-                {
-                    db.Products.Update(productToUpdate);
-
-                    return await db.SaveChangesAsync() >= 1;
-                }
-                catch (Exception e)
-                {
-                    return false;
-                }
-            }
-        }
-
-        internal async static Task<bool> DeletePostAsync(int productId)
-        {
-            using (var db = new AppDatabaseContext())
-            {
-                try
-                {
-                    Products productToDelete = await GetProductsByIdAsync(productId);
-
-                    db.Remove(productToDelete);
-
-                    return await db.SaveChangesAsync() >= 1;
-                }
-                catch (Exception e)
-                {
-                    return false;
-                }
-            }
-        }
-
     }
 }
