@@ -24,5 +24,8 @@ namespace Gourmet.Database
         [MaxLength(10000)]
         public string ProductDescription { get; set; } = string.Empty;
 
+        [Required]
+        public byte[] ProductImage { get; set; }
+
     }
 }
