@@ -1,11 +1,18 @@
 ﻿import React, { Component } from 'react';
+import {Product} from "./Products/Product";
 
 export class Products extends Component {
-
+    constructor(props) {
+        super(props);
+        this.cost = 5
+    }
     render() {
         return (
-            <div>
-                <h1>This is the products page and there will be displayed products from database and their properties</h1>
+            <div className="products-container">
+                <Product price = {this.cost} />
+                <Product price = {this.cost} />
+                <Product price = {this.cost} />
+                <Product price = {this.cost} />
             </div>
         );
     }

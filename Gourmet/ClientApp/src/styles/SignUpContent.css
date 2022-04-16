@@ -9,7 +9,7 @@
     /* background-image: url("../images/signup.jpeg");
     background-repeat: no-repeat;
     background-size: cover; */
-    
+
 }
 
 .signup--window {
@@ -20,9 +20,10 @@
     padding: 15px;
     border: solid #d86f0b 1px;
     border-radius: 20px;
-    margin:200px
+    margin: 200px
 }
-.signup--window > h1 {
+
+.signup--window>h1 {
     font-size: 30px;
 }
 
@@ -31,15 +32,15 @@
     width: 300px;
     display: flex;
     flex-direction: column;
-    align-items:flex-start;
+    align-items: flex-start;
 }
 
-.signup--window--elements > h5 {
+.signup--window--elements>h5 {
     margin-bottom: 10px;
     align-self: flex-start;
 }
 
-.signup--window--elements > input {
+.signup--window--elements>input {
     margin-bottom: 10px;
     border-radius: 10px;
     width: 100%;
@@ -55,7 +56,7 @@
     align-self: center;
 }
 
-.signup--window--buttons > button {
+.signup--window--buttons>button {
     width: 160px;
     height: 30px;
     border: none;
@@ -74,4 +75,8 @@
     object-fit: contain;
 }
 
-
+.signup--error--text {
+    color: red;
+    font-size: 12px;
+    font-weight: 600;
+}

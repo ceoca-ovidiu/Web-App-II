@@ -9,7 +9,7 @@
     /* background-image: url("../images/login.jpeg");
     background-repeat: no-repeat;
     background-size: cover; */
-    
+
 }
 
 .login--window {
@@ -22,9 +22,10 @@
     padding: 15px;
     border: solid #d86f0b 1px;
     border-radius: 20px;
-    margin:200px
+    margin: 200px
 }
-.login--window > h1 {
+
+.login--window>h1 {
     font-size: 30px;
 }
 
@@ -32,11 +33,11 @@
     margin: 15px;
 }
 
-.login--window--elements > h5 {
+.login--window--elements>h5 {
     margin-bottom: 10px;
 }
 
-.login--window--elements > input {
+.login--window--elements>input {
     margin-bottom: 10px;
     border-radius: 10px;
     text-indent: 5px;
@@ -50,7 +51,7 @@
     justify-content: space-around;
 }
 
-.login--window--buttons > button {
+.login--window--buttons>button {
     width: 80px;
     height: 30px;
     border: none;
@@ -69,4 +70,8 @@
     object-fit: contain;
 }
 
-
+.login--error--text {
+    color: red;
+    font-size: 12px;
+    font-weight: 600;
+}

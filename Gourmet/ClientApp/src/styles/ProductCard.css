@@ -1,0 +1,39 @@
+.card-container {
+    width: 250px;
+    max-height: 500px;
+    border: solid black 1px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+}
+
+.card-image {
+    max-width: 200px;
+    max-height: 200px;
+    margin-bottom: 10px;
+}
+
+.card-subtitle {
+    margin-bottom: 10px;
+}
+
+.card-container > p {
+    font-size: 15px;
+    max-width: 200px;
+    overflow-x: hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    max-height: 150px;
+}
+.card-addButton {
+    border-radius: 10px;
+    background-color: #dcbe39;
+    padding: 3px 20px 3px 20px;
+}
+
+.products-container {
+    display: flex;
+    justify-content: space-between;
+}

@@ -6,7 +6,7 @@ import { Link, useHistory } from "react-router-dom";
 
 export class Login extends Component {
 
-    constructor(props){
+    constructor(props) {
         super(props)
         this.state = {
             username: '',
@@ -16,11 +16,13 @@ export class Login extends Component {
         this.handleSubmit = this.handleSubmit.bind(this)
         this.sendCredentials = this.sendCredentials.bind(this)
         this.toSignUp = this.toSignUp.bind(this)
+        this.noUserError = false
+        this.wrongPasswordError = false
     }
 
     // this.handleChange = this.handleChange.bind(this);
 
-    handleChange(event){
+    handleChange(event) {
         const target = event.target;
         const value = target.value;
         const name = target.name;
@@ -47,32 +49,49 @@ export class Login extends Component {
         }
         axios.post(apiUrl, data)
             .then((result) => {
-                console.log(result)
+                switch (result) {
+                    case "Wrong password": {
+                        this.wrongPasswordError = true;
+                        break;
+                    }
+                    case "No username": {
+                        this.noUserError = true;
+                        break;
+                    }
+                    default: {
+                        this.wrongPasswordError = false;
+                        this.noUserError = false;
+                        // TODO: Redirect user to Home Page
+                        break;
+                    }
+                }
             })
     }
 
-    toSignUp(){
+    toSignUp() {
         this.props.history.push('/signup')
     }
-    render () {
+    render() {
         return (
             <div className="login--container">
-                <img src={loginPic} className ="login--image"/>
+                <img src={loginPic} className="login--image" />
                 <div className="login--window">
                     <h1> LOGIN </h1>
                     <form>
                         <div className="login--window--elements">
                             <h5>Username</h5>
-                            <input name = "username" value = {this.state.username} type="text" placeholder="Type in your username" onChange={this.handleChange} required></input>
+                            <input name="username" value={this.state.username} type="text" placeholder="Type in your username" onChange={this.handleChange} required></input>
+                            {this.noUserError && <h3 className="login--error--text">Username does not exist!</h3>}
                             <h5>Password</h5>
-                            <input name = "password" value = {this.state.password} type="password" placeholder="Type in your password" onChange={this.handleChange} required></input>
+                            <input name="password" value={this.state.password} type="password" placeholder="Type in your password" onChange={this.handleChange} required></input>
+                            {this.wrongPasswordError && <h6 className="login--error--text">Wrong password!</h6>}
                             <div className="login--window--buttons">
                                 <button type="submit" onClick={this.handleSubmit}> Login </button>
-                                <button onClick={this.toSignUp}> Sign up</button>    
+                                <button onClick={this.toSignUp}> Sign up</button>
                             </div>
                         </div>
                     </form>
-                    
+
 
                 </div>
             </div>
