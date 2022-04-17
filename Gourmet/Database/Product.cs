@@ -3,7 +3,7 @@
 namespace Gourmet.Database
 
 {
-    internal sealed class Products
+    public class Product
     {
         [Key]
         public int ProductId { get; set; }

@@ -5,19 +5,19 @@ using System.Data;
 
 namespace Gourmet.Database
 {
-    internal sealed class AppDatabaseContext : DbContext
+    public class AppDatabaseContext : DbContext
     {
 
-        public DbSet<Products> ProductsDbSet { get; set; }
-        public DbSet<Users> UsersDbSet { get; set; }
-        public DbSet<Recipes> RecipesDbSet { get; set; }
+        public DbSet<Product> ProductsDbSet { get; set; }
+        public DbSet<User> UsersDbSet { get; set; }
+        public DbSet<Recipe> RecipesDbSet { get; set; }
         private int rowCount = 0;
         private int colCount = 0;
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder dbContextOptionsBuilder)
         {
-            Console.WriteLine("Calling OnConfiguring from AppDatabaseContext and configure the database...");
+            System.Diagnostics.Debug.WriteLine("Calling OnConfiguring from AppDatabaseContext and configure the database...");
             dbContextOptionsBuilder.UseSqlite("Data Source=./Database/ApplicationDatabase.db");
         }
 
@@ -104,7 +104,7 @@ namespace Gourmet.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            Console.WriteLine("Calling OnModelCreating from AppDatabaseContext and creating the database...");
+            System.Diagnostics.Debug.WriteLine("Calling OnModelCreating from AppDatabaseContext and creating the database...");
         }
     }
 }

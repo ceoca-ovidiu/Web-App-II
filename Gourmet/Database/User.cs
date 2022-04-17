@@ -2,7 +2,7 @@
 
 namespace Gourmet.Database
 {
-    internal sealed class Users
+    public class User
     {
         [Key]
         public string Username { get; set; }
@@ -19,8 +19,5 @@ namespace Gourmet.Database
         [MaxLength(100)]
         public string UserPhoneNumber { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(100)]
-        public byte[] UserImage { get; set; }
     }
 }
