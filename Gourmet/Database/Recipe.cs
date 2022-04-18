@@ -2,7 +2,7 @@
 
 namespace Gourmet.Database
 {
-    internal sealed class Recipes
+    public class Recipe
     {
         [Key]
         public int RecipeID { get; set; }
@@ -21,7 +21,7 @@ namespace Gourmet.Database
         
         [Required]
         [MaxLength(100)]
-        public Products RecipeProductReference { get; set; }
+        public Product RecipeProductReference { get; set; }
 
     }
 }
