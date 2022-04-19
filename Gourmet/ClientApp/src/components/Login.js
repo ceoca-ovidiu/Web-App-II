@@ -35,6 +35,15 @@ export default function Login(props) {
     // this.sendCredentials(username, password);
     // TODO: send credentials and check for user => get back with a response
     // sessionStorage.clear()
+    const userCookie = new Cookies();
+    userCookie.set("user", stateData.username, {
+      path: "/",
+      maxAge: 10, // given in seconds => TO BE MODIFIED
+    });
+    sessionStorage.setItem("username", stateData.username);
+    // sessionStorage.clear();
+    props.toggleIsLoggedIn();
+    history.push("/");
   }
 
   function sendCredentials(username, password) {

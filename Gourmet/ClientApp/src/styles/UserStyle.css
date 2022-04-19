@@ -1,0 +1,119 @@
+.main-container {
+  display: flex;
+  flex-direction: row;
+  flex-flow: wrap;
+  width: 100%;
+  max-width: 100%;
+  justify-content: center;
+  margin-top: 15px;
+  background-color: whitesmoke;
+  box-shadow: 2px 2px 2px 2px #b6b6b6;
+  border-radius: 10px;
+
+  /* position: relative; */
+}
+.user-data {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 25%;
+  padding: 15px;
+  border-right: solid 1px gray;
+  min-width: 250px;
+  margin-bottom: 15px;
+  margin-top: 15px;
+  padding-right: 15px;
+}
+
+.user-data h5 {
+  font-size: 18px;
+  margin-top: 15px;
+  margin-bottom: 0px;
+}
+.user-image {
+  max-width: 100px;
+  max-height: 100px;
+  margin-top: 15px;
+}
+
+.active-data {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-right: solid 1px gray;
+  padding-top: 15px;
+  width: 50%;
+  min-width: 250px;
+  margin-bottom: 15px;
+  margin-top: 15px;
+  padding-right: 15px;
+}
+
+.active-data form {
+  min-width: inherit;
+  width: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.active-data form h5 {
+  font-size: 18px;
+}
+
+.active-data form input {
+  width: 250px;
+  text-indent: 5px;
+  font-size: 16px;
+  padding: 2px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+}
+
+.submit-button {
+  border-radius: 10px;
+  border: none;
+  background-color: #303030;
+  padding: 3px 20px 3px 20px;
+  cursor: pointer;
+  color: white;
+  width: 125px;
+}
+
+.submit-button:hover {
+  background-color: #4f4f4f;
+}
+.option-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 0px;
+  width: 25%;
+  border-radius: 10px;
+  min-width: 250px;
+  margin-bottom: 15px;
+  margin-top: 15px;
+}
+
+.option-panel ul {
+  list-style-type: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.option-panel ul li {
+  /* margin-top: 15px; */
+  font-size: 18px;
+  border-bottom: solid 1px gray;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-left: 15px;
+}
+
+.option-panel ul li:hover {
+  background-color: #b6b6b6;
+  cursor: pointer;
+}
