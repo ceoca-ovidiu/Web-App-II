@@ -57,6 +57,13 @@ export default function NavMenu(props) {
                   Login
                 </NavLink>
               </NavItem>
+              {props.isLoggedIn && (
+                <NavItem>
+                  <NavLink tag={Link} className="text-dark" to="/user">
+                    User
+                  </NavLink>
+                </NavItem>
+              )}
             </ul>
           </Collapse>
         </Container>

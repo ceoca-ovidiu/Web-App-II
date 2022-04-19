@@ -83,6 +83,7 @@ export default function Products(props) {
     <div className="products-container">
       {elements.map((element) => (
         <Product
+          key={element}
           imageSource={element.imageSource}
           name={element.name}
           text={element.description}
