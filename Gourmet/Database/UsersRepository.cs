@@ -1,62 +1,268 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Data;
+using System.Data.SqlClient;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Gourmet.Database
 {
-    internal sealed class UsersRepository
+    public class UsersRepository
     {
-        internal async static Task<List<Users>> GetUsersAsync(AppDatabaseContext db)
+        public List<User> GetUsersList()
         {
-            return await db.UsersDbSet.ToListAsync();
+            using (var db = new AppDatabaseContext())
+            {
+                List<User> users = db.UsersDbSet.ToList();
+                if (users == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("DECLINED => The users list is null. NULL will be returned");
+                    return null;
+                }
+                else if (users.Count == 0)
+                {
+                    System.Diagnostics.Debug.WriteLine("DECLINED => The users list is empty. An empty list will be returned");
+                    return users;
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("ACCEPTED => The users list returned");
+                    return users;
+                }
+            }
         }
 
-        internal async static Task<Users> GetUsersByUsernameAsync(String username, AppDatabaseContext db)
+        public User GetUserByUsername(string username)
         {
-            return await db.UsersDbSet.FirstOrDefaultAsync(users => users.Username == username);
+            using (var db = new AppDatabaseContext())
+            {
+                User user = db.UsersDbSet.FirstOrDefault(users => users.Username == username);
+                if (user == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("DECLINED => The user is null. NULL will be returned");
+                    return null;
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("ACCEPTED => The user with username : " + user.Username + " is returned");
+                    return user;
+                }
+            }
+
         }
 
-        internal async static Task<bool> CreateUserAsync(Users userToCreate, AppDatabaseContext db)
+        public User GetUserByEmail(string email)
         {
+            using (var db = new AppDatabaseContext())
+            {
+                User user = db.UsersDbSet.FirstOrDefault(users => users.UserEmail == email);
+                if (user == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("DECLINED => The user is null. NULL will be returned");
+                    return null;
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("ACCEPTED => The user with username : " + user.Username + " is returned");
+                    return user;
+                }
+            }
+        }
+
+        public Boolean CreateUser(User userToCreate)
+        {
+            using (var db = new AppDatabaseContext())
+            {
+                try
+                {
+                    if (userToCreate == null)
+                    {
+                        System.Diagnostics.Debug.WriteLine("DECLINED => The user received is null");
+                        return false;
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Trying to add the user");
+                        db.UsersDbSet.Add(userToCreate);
+                        db.SaveChanges();
+                        System.Diagnostics.Debug.WriteLine("ACCEPTED => The user was added to dataset. Saving changes...");
+                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Done");
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("DECLINED => The user could not be added");
+                    return false;
+                }
+            }
+        }
+
+        public Boolean UpdateUser(User userToUpdate)
+        {
+            using (var db = new AppDatabaseContext())
+            {
+                try
+                {
+                    if (userToUpdate == null)
+                    {
+                        System.Diagnostics.Debug.WriteLine("DECLINED => The user received is null");
+                        return false;
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Trying to update the user");
+                        db.UsersDbSet.Update(userToUpdate);
+                        db.SaveChanges();
+                        System.Diagnostics.Debug.WriteLine("ACCEPTED => The user was updated. Saving changes...");
+                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Done");
+                        return true;
+                    }
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine("DECLINED => The user could not be updated");
+                    return false;
+                }
+            }
+        }
+
+        public Boolean IsPasswordValid(string passwordToCheck)
+        {
+            using (var db = new AppDatabaseContext())
+            {
+                // TO BE DEFINED
+                throw new NotImplementedException();
+            }
+
+        }
+
+        public Boolean IsEmailCorrectWritten(String email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                System.Diagnostics.Debug.WriteLine("DECLINED => The email string passed is null or empty");
+                return false;
+            }
+
             try
             {
-                await db.UsersDbSet.AddAsync(userToCreate);
+                System.Diagnostics.Debug.WriteLine("ACCEPTED => The email string passed is being processed");
+                // Normalize the domain
+                email = Regex.Replace(email, @"(@)(.+)$", DomainMapper,
+                                      RegexOptions.None, TimeSpan.FromMilliseconds(200));
 
-                return await db.SaveChangesAsync() >= 1;
+                // Examines the domain part of the email and normalizes it.
+                string DomainMapper(Match match)
+                {
+                    // Use IdnMapping class to convert Unicode domain names.
+                    var idn = new IdnMapping();
+
+                    // Pull out and process domain name (throws ArgumentException on invalid)
+                    string domainName = idn.GetAscii(match.Groups[2].Value);
+
+                    return match.Groups[1].Value + domainName;
+                }
             }
-            catch (Exception e)
+            catch (RegexMatchTimeoutException e)
             {
+                System.Diagnostics.Debug.WriteLine("DECLINED => The email string passed could not be processed");
+                return false;
+            }
+            catch (ArgumentException e)
+            {
+                System.Diagnostics.Debug.WriteLine("DECLINED => The email string passed could not be processed");
+                return false;
+            }
+
+            try
+            {
+                return Regex.IsMatch(email,
+                    @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+                    RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                System.Diagnostics.Debug.WriteLine("DECLINED => The email string passed could not be processed");
                 return false;
             }
         }
 
-        internal async static Task<bool> UpdateUserAsync(Users userToUpdate, AppDatabaseContext db)
+        public Boolean IsEmailValid(String emailToCheck)
         {
-            try
+            using (var db = new AppDatabaseContext())
             {
-                db.UsersDbSet.Update(userToUpdate);
+                List<User> usersList = GetUsersList();
 
-                return await db.SaveChangesAsync() >= 1;
-            }
-            catch (Exception e)
-            {
-                return false;
+                foreach (User user in usersList)
+                {
+                    if (user.UserEmail == emailToCheck)
+                    {
+                        System.Diagnostics.Debug.WriteLine("DECLINED => There is already a user with the email : " + emailToCheck + " in database");
+                        return false;
+                    }
+                }
+
+                if (IsEmailCorrectWritten(emailToCheck))
+                {
+                    System.Diagnostics.Debug.WriteLine("ACCEPTED => The email is valid");
+                    return true;
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("DECLINED => The email : " + emailToCheck + " is not correct written");
+                    return false;
+                }
             }
         }
 
-        internal async static Task<bool> DeleteUserAsync(String username, AppDatabaseContext db)
+        public Boolean DeleteUserByUsername(String username)
         {
-            try
+            using (var db = new AppDatabaseContext())
             {
-                Users userToDelete = await GetUsersByUsernameAsync(username, db);
+                try
+                {
+                    System.Diagnostics.Debug.WriteLine("ACCEPTED => Trying to remove a user...");
+                    User userToDelete = GetUserByUsername(username);
+                    if (userToDelete != null)
+                    {
+                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Found the user with username : " + username);
+                        db.Remove(userToDelete);
+                        System.Diagnostics.Debug.WriteLine("ACCEPTED => The user was removed. Saving changes...");
+                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Done");
+                        return db.SaveChanges() >= 1;
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("DECLINED => The user is null and could not be removed");
+                        return false;
+                    }
 
-                db.Remove(userToDelete);
-
-                return await db.SaveChangesAsync() >= 1;
-            }
-            catch (Exception e)
-            {
-                return false;
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine("DECLINED => The user with username " + username + " could not be found or could not be removed");
+                    return false;
+                }
             }
         }
 
+        public Boolean IsUsernameValid(String usernameToCheck)
+        {
+            using (var db = new AppDatabaseContext())
+            {
+                List<User> usersList = GetUsersList();
+
+                foreach (User user in usersList)
+                {
+                    if (user.Username == usernameToCheck)
+                    {
+                        System.Diagnostics.Debug.WriteLine("DECLINED => There is already a user with the username : " + usernameToCheck + " in database");
+                        return false;
+                    }
+                }
+                System.Diagnostics.Debug.WriteLine("ACCEPTED => The username is valid");
+                return true;
+            }
+        }
     }
 }
