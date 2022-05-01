@@ -14,32 +14,36 @@ namespace Gourmet.Controllers
         [Route("signup")]
         public IActionResult SignUp([FromBody] User user)
         {
-            System.Diagnostics.Debug.WriteLine("########## AM INTRAT IN SIGN UP ##########");
-            if (usersRepository.IsEmailCorrectWritten(user.UserEmail))
-            {
-                System.Diagnostics.Debug.WriteLine("########## EMAIL-UL ESTE CORECT ##########");
-                if (usersRepository.IsUsernameValid(user.Username))
-                {
-                    System.Diagnostics.Debug.WriteLine("########## USERNAME-UL ESTE CORECT ##########");
-                    if (usersRepository.IsPasswordValid(user.UserPassword))
-                    {
-                        System.Diagnostics.Debug.WriteLine("########## PASSWORD-UL ESTE CORECT ##########");
-                        return Ok();
-                    }
-                    else
-                    {
-                        return BadRequest();
-                    }
-                }
-                else
-                {
-                    return BadRequest();
-                }
-            }
-            else
-            {
-                return BadRequest();
-            }
+            System.Diagnostics.Debug.WriteLine(user.Username);
+            System.Diagnostics.Debug.WriteLine(user.UserEmail);
+            System.Diagnostics.Debug.WriteLine(user.UserPassword);
+            //System.Diagnostics.Debug.WriteLine("########## AM INTRAT IN SIGN UP ##########");
+            
+            //if (usersRepository.IsEmailCorrectWritten(user.UserEmail))
+            //{
+            //    System.Diagnostics.Debug.WriteLine("########## EMAIL-UL ESTE CORECT ##########");
+            //    if (usersRepository.IsUsernameValid(user.Username))
+            //    {
+            //        System.Diagnostics.Debug.WriteLine("########## USERNAME-UL ESTE CORECT ##########");
+            //        if (usersRepository.IsPasswordValid(user.UserPassword))
+            //        {
+            //            System.Diagnostics.Debug.WriteLine("########## PASSWORD-UL ESTE CORECT ##########");
+            //            return Ok();
+            //        }
+            //        else
+            //        {
+            //            return BadRequest();
+            //        }
+            //    }
+            //    else
+            //    {
+            //        return BadRequest();
+            //    }
+            //}
+            //else
+            //{
+            //    return BadRequest();
+            //}
             return Ok();
         }
 
