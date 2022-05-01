@@ -126,14 +126,22 @@ namespace Gourmet.Database
             }
         }
 
-        public Boolean IsPasswordValid(string passwordToCheck)
+        public Boolean IsPasswordValid(string passwordToCheck, string userName)
         {
-            using (var db = new AppDatabaseContext())
+            if (string.IsNullOrEmpty(passwordToCheck) || string.IsNullOrEmpty(userName))
             {
-                // TO BE DEFINED
-                throw new NotImplementedException();
+                System.Diagnostics.Debug.WriteLine("DECLINED => Password or username is not correct");
+                return false;
             }
-
+            else if (passwordToCheck.Contains(userName))
+            {
+                System.Diagnostics.Debug.WriteLine("DECLINED => Password contains username");
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public Boolean IsEmailCorrectWritten(String email)
@@ -143,47 +151,18 @@ namespace Gourmet.Database
                 System.Diagnostics.Debug.WriteLine("DECLINED => The email string passed is null or empty");
                 return false;
             }
-
-            try
+            else
             {
-                System.Diagnostics.Debug.WriteLine("ACCEPTED => The email string passed is being processed");
-                // Normalize the domain
-                email = Regex.Replace(email, @"(@)(.+)$", DomainMapper,
-                                      RegexOptions.None, TimeSpan.FromMilliseconds(200));
-
-                // Examines the domain part of the email and normalizes it.
-                string DomainMapper(Match match)
+                if ((email.Contains(".com") || email.Contains(".ro")) && email.Contains("@"))
                 {
-                    // Use IdnMapping class to convert Unicode domain names.
-                    var idn = new IdnMapping();
-
-                    // Pull out and process domain name (throws ArgumentException on invalid)
-                    string domainName = idn.GetAscii(match.Groups[2].Value);
-
-                    return match.Groups[1].Value + domainName;
+                    System.Diagnostics.Debug.WriteLine("ACCEPTED => The email string passed is OK");
+                    return true;
                 }
-            }
-            catch (RegexMatchTimeoutException e)
-            {
-                System.Diagnostics.Debug.WriteLine("DECLINED => The email string passed could not be processed");
-                return false;
-            }
-            catch (ArgumentException e)
-            {
-                System.Diagnostics.Debug.WriteLine("DECLINED => The email string passed could not be processed");
-                return false;
-            }
-
-            try
-            {
-                return Regex.IsMatch(email,
-                    @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
-                    RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
-            }
-            catch (RegexMatchTimeoutException)
-            {
-                System.Diagnostics.Debug.WriteLine("DECLINED => The email string passed could not be processed");
-                return false;
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("DECLINED => The email string passed does not contains specific elements");
+                    return false;
+                }
             }
         }
 
