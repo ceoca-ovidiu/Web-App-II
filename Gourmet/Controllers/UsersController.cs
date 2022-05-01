@@ -14,34 +14,36 @@ namespace Gourmet.Controllers
         [Route("signup")]
         public string SignUp([FromBody] User user)
         {
-            System.Diagnostics.Debug.WriteLine("########## AM INTRAT IN SIGN UP ##########");
-            if (usersRepository.IsEmailCorrectWritten(user.UserEmail))
-            {
-                System.Diagnostics.Debug.WriteLine("########## EMAIL-UL ESTE CORECT ##########");
-                if (usersRepository.IsUsernameValid(user.Username))
-                {
-                    System.Diagnostics.Debug.WriteLine("########## USERNAME-UL ESTE CORECT ##########");
+            System.Diagnostics.Debug.WriteLine(user.Username);
+            System.Diagnostics.Debug.WriteLine(user.UserEmail);
+            System.Diagnostics.Debug.WriteLine(user.UserPassword);
+            //System.Diagnostics.Debug.WriteLine("########## AM INTRAT IN SIGN UP ##########");
+            
+            //if (usersRepository.IsEmailCorrectWritten(user.UserEmail))
+            //{
                     if (usersRepository.IsPasswordValid(user.UserPassword, user.Username))
-                    {
-                        System.Diagnostics.Debug.WriteLine("########## PASSWORD-UL ESTE CORECT ##########");
+            //    if (usersRepository.IsUsernameValid(user.Username))
+            //    {
                         usersRepository.CreateUser(user);
                         return "Sunt aici si am lipici si totul e OK";
-                    }
-                    else
-                    {
+            //        {
+            //            System.Diagnostics.Debug.WriteLine("########## PASSWORD-UL ESTE CORECT ##########");
+            //            return Ok();
                         return "Hai ca nu e ok 4";
-                    }
-                }
-                else
-                {
+            //        else
+            //        {
+            //            return BadRequest();
+            //        }
                     return "Hai ca nu e ok 3";
-                }
-            }
-            else
-            {
+            //    else
+            //    {
+            //        return BadRequest();
+            //    }
                 return "Hai ca nu e ok 2";
-            }
+            //else
             return "Hai ca nu e ok 1";
+            //    return BadRequest();
+            //}
         }
 
         [HttpGet]

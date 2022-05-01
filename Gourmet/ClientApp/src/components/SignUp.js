@@ -4,48 +4,48 @@ import signUpPic from "../images/login.jpeg";
 import axios from "axios";
 import { useState } from "react";
 import Constants from "../utils/Constants";
+import bcrypt from "bcryptjs";
 
 export default function SignUp(props) {
-  const [stateData, setStateData] = useState({
+  let [stateData, setStateData] = useState({
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
 
-  const userExistsError = false;
-  const emailExistsError = false;
-  const passwordMatchError = false;
+  let userExistsError = false;
+  let emailExistsError = false;
+  let passwordMatchError = false;
 
   function handleChange(event) {
-    const target = event.target;
-    const value = target.value;
-    const name = target.name;
+    let target = event.target;
+    let value = target.value;
+    let name = target.name;
     setStateData({
       ...stateData,
       [name]: value,
     });
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    const username = stateData.username;
-    const email = stateData.email;
-    const password = stateData.password;
-    const confirmPassword = stateData.confirmPassword;
-
+    let salt = bcrypt.genSalt(10);
+    let username = stateData.username;
+    let email = stateData.email;
+    let password = stateData.password;
+    let confirmPassword = stateData.confirmPassword;
     if (password === confirmPassword) {
-      console.log("YOU SUBMITTED");
-      console.log(stateData);
-      // this.sendCredentials(username, email, password);
+      // this.sendCredentials(username, email, bcrypt.hashSync(password));
       passwordMatchError = false;
+      console.log(bcrypt.hashSync(password));
     } else {
       passwordMatchError = true;
     }
   }
 
   function sendCredentials(username, email, password) {
-    const data = {
+    let data = {
       Username: username,
       UserEmail: email,
       UserPassword: password,

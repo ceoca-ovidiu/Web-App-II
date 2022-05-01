@@ -6,43 +6,53 @@ import Constants from "../utils/Constants";
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import loginPic from "../images/login.jpeg";
+import bcrypt from "bcryptjs";
 
 export default function Login(props) {
-  const [stateData, setStateData] = useState({
+  let [stateData, setStateData] = useState({
     username: "",
     password: "",
   });
-  const wrongPasswordError = false;
-  const noUserError = false;
-  const history = useHistory();
+  let wrongPasswordError = false;
+  let noUserError = false;
+  let history = useHistory();
 
   function handleChange(event) {
-    const target = event.target;
-    const value = target.value;
-    const name = target.name;
+    let target = event.target;
+    let value = target.value;
+    let name = target.name;
     setStateData({
       ...stateData,
       [name]: value,
     });
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    const username = stateData.username;
-    const password = stateData.password;
+    let username = stateData.username;
+    let password = bcrypt.hashSync(stateData.password);
     console.log("YOU SUBMITTED");
-    console.log(username + "and" + password);
+    console.log(username + " and " + password);
     // this.sendCredentials(username, password);
     // TODO: send credentials and check for user => get back with a response
     // sessionStorage.clear()
+    let userCookie = new Cookies();
+    userCookie.set("user", stateData.username, {
+      path: "/",
+      maxAge: 10, // given in seconds => TO BE MODIFIED
+    });
+    sessionStorage.setItem("username", stateData.username);
+    // sessionStorage.clear();
+    props.toggleIsLoggedIn();
+    history.push("/");
   }
 
   function sendCredentials(username, password) {
-    const data = {
+    let data = {
       username: username,
-      password: password,
+      password: bcrypt.hashSync(password),
     };
-    axios.post(Constants.BASE_URL + Constants.LOGIN, data).then((result) => {
+    axios.get(Constants.BASE_URL + Constants.LOGIN, data).then((result) => {
       switch (result) {
         case "Wrong password": {
           wrongPasswordError = true;
@@ -56,7 +66,7 @@ export default function Login(props) {
           wrongPasswordError = false;
           noUserError = false;
           // TODO: Redirect user to Home Page
-          const userCookie = new Cookies();
+          let userCookie = new Cookies();
           userCookie.set("user", data.username, {
             path: "/",
             maxAge: 10, // given in seconds => TO BE MODIFIED

@@ -5,7 +5,7 @@ import { Container } from "reactstrap";
 export default function Layout(props) {
   return (
     <div>
-      <NavMenu />
+      <NavMenu isLoggedIn={props.isLoggedIn} />
       <Container className="container mh-100 mw-90">{props.children}</Container>
     </div>
   );
