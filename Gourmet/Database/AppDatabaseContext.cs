@@ -13,8 +13,6 @@ namespace Gourmet.Database
         public DbSet<Recipe> RecipesDbSet { get; set; }
         private int rowCount = 0;
         private int colCount = 0;
-
-
         protected override void OnConfiguring(DbContextOptionsBuilder dbContextOptionsBuilder)
         {
             System.Diagnostics.Debug.WriteLine("Calling OnConfiguring from AppDatabaseContext and configure the database...");
