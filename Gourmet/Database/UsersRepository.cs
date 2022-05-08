@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
@@ -8,122 +9,229 @@ namespace Gourmet.Database
 {
     public class UsersRepository
     {
-        public List<User> GetUsersList()
+        public List<User> GetAllUsers()
         {
-            using (var db = new AppDatabaseContext())
+            AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+            List<User> users = appDatabaseContext.UsersDbSet.ToList();
+            if (users == null)
             {
-                List<User> users = db.UsersDbSet.ToList();
-                if (users == null)
-                {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The users list is null. NULL will be returned");
-                    return null;
-                }
-                else if (users.Count == 0)
-                {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The users list is empty. An empty list will be returned");
-                    return users;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("ACCEPTED => The users list returned");
-                    return users;
-                }
+                Debug.WriteLine("DECLINED => The users list is null. NULL will be returned");
+                return null;
+            }
+            else if (users.Count == 0)
+            {
+                Debug.WriteLine("DECLINED => The users list is empty. An empty list will be returned");
+                return users;
+            }
+            else
+            {
+                Debug.WriteLine("ACCEPTED => The users list returned");
+                return users;
             }
         }
 
-        public User GetUserByUsername(string username)
+        public string Login(User user)
         {
-            using (var db = new AppDatabaseContext())
+            AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+            foreach (User userIterator in appDatabaseContext.UsersDbSet)
             {
-                User user = db.UsersDbSet.FirstOrDefault(users => users.Username == username);
-                if (user == null)
+                Debug.WriteLine("=======================================> Checking user " + userIterator.Username + " " + userIterator.UserEmail);
+                if (userIterator.Username.Equals(user.Username))
                 {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The user is null. NULL will be returned");
-                    return null;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("ACCEPTED => The user with username : " + user.Username + " is returned");
-                    return user;
-                }
-            }
-
-        }
-
-        public User GetUserByEmail(string email)
-        {
-            using (var db = new AppDatabaseContext())
-            {
-                User user = db.UsersDbSet.FirstOrDefault(users => users.UserEmail == email);
-                if (user == null)
-                {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The user is null. NULL will be returned");
-                    return null;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("ACCEPTED => The user with username : " + user.Username + " is returned");
-                    return user;
-                }
-            }
-        }
-
-        public Boolean CreateUser(User userToCreate)
-        {
-            using (var db = new AppDatabaseContext())
-            {
-                try
-                {
-                    if (userToCreate == null)
+                    if (userIterator.UserPassword.Equals(user.UserPassword))
                     {
-                        System.Diagnostics.Debug.WriteLine("DECLINED => The user received is null");
-                        return false;
+                        return "The user has been found";
+                    }
+                    return "The password does not match";
+                }
+            }
+            return "The user could not be found";
+        }
+
+        public string ChangeEmail(User user)
+        {
+            if (IsEmailValid(user.UserEmail))
+            {
+                AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+                foreach (User userIterator in appDatabaseContext.UsersDbSet)
+                {
+                    Debug.WriteLine("=======================================> Checking user " + userIterator.Username + " " + userIterator.UserEmail);
+                    if (userIterator.Username.Equals(user.Username))
+                    {
+                        Debug.WriteLine("=======================================> The user has been found " + userIterator.Username);
+                        User userToAdd = new User();
+                        userToAdd.Username = user.Username;
+                        userToAdd.UserPassword = userIterator.UserPassword;
+                        userToAdd.UserEmail = user.UserEmail;
+                        userToAdd.UserPhoneNumber = userIterator.UserPhoneNumber;
+                        appDatabaseContext.UsersDbSet.Remove(userIterator);
+                        appDatabaseContext.UsersDbSet.Add(userToAdd);
+                        appDatabaseContext.SaveChanges();
+                        return "The user email has been updated successfully";
+                    }
+                }
+                return "Could not update user email";
+            }
+            else
+            {
+                return "The email is not valid";
+            }
+        }
+
+        public string ChangePhone(User user)
+        {
+            if (IsPhoneNumberValid(user.UserPhoneNumber))
+            {
+                AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+                foreach (User userIterator in appDatabaseContext.UsersDbSet)
+                {
+                    Debug.WriteLine("=======================================> Checking user " + userIterator.Username + " " + userIterator.UserEmail);
+                    if (userIterator.Username.Equals(user.Username))
+                    {
+                        Debug.WriteLine("=======================================> The user has been found " + userIterator.Username);
+                        User userToAdd = new User();
+                        userToAdd.Username = user.Username;
+                        userToAdd.UserPassword = userIterator.UserPassword;
+                        userToAdd.UserEmail = userIterator.UserEmail;
+                        userToAdd.UserPhoneNumber = user.UserPhoneNumber;
+                        appDatabaseContext.UsersDbSet.Remove(userIterator);
+                        appDatabaseContext.UsersDbSet.Add(userToAdd);
+                        appDatabaseContext.SaveChanges();
+                        return "The user phone number has been updated successfully";
+                    }
+                }
+                return "Could not update user phone number";
+            }
+            else
+            {
+                return "The phone number is not valid";
+            }
+        }
+
+        public string ChangePassword(User user)
+        {
+            if (user.UserPassword.Equals(user.Username) || String.IsNullOrEmpty(user.UserPassword))
+            {
+                return "The password is the same as the username or is empty ==> ERROR";
+            }
+            else
+            {
+                AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+                foreach (User userIterator in appDatabaseContext.UsersDbSet)
+                {
+                    Debug.WriteLine("=======================================> Checking user " + userIterator.Username + " " + userIterator.UserEmail);
+                    if (userIterator.Username.Equals(user.Username))
+                    {
+                        Debug.WriteLine("=======================================> The user has been found " + userIterator.Username);
+                        User userToAdd = new User();
+                        userToAdd.Username = user.Username;
+                        userToAdd.UserPassword = user.UserPassword;
+                        userToAdd.UserEmail = userIterator.UserEmail;
+                        userToAdd.UserPhoneNumber = userIterator.UserPhoneNumber;
+                        appDatabaseContext.UsersDbSet.Remove(userIterator);
+                        appDatabaseContext.UsersDbSet.Add(userToAdd);
+                        appDatabaseContext.SaveChanges();
+                        return "The user password has been updated successfully";
+                    }
+                }
+                return "Could not update user password";
+            }
+        }
+
+        public User GetUser(User user)
+        {
+            AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+            foreach (User userIterator in appDatabaseContext.UsersDbSet)
+            {
+                Debug.WriteLine("=======================================> Checking user " + userIterator.Username + " " + userIterator.UserEmail);
+                if (userIterator.Username.Equals(user.Username))
+                {
+                    Debug.WriteLine("=======================================> The user has been found " + userIterator.Username);
+                    return userIterator;
+                }
+            }
+            return null;
+        }
+
+        public string SignUp(User user)
+        {
+            if (IsUsernameValid(user.Username))
+            {
+                if (IsEmailValid(user.UserEmail))
+                {
+                    if (String.IsNullOrEmpty(user.UserPassword) || String.IsNullOrEmpty(user.UserPhoneNumber))
+                    {
+                        return "User password or phone number empty";
                     }
                     else
                     {
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Trying to add the user");
-                        db.UsersDbSet.Add(userToCreate);
-                        db.SaveChanges();
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => The user was added to dataset. Saving changes...");
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Done");
-                        return true;
+                        if (user.UserPassword.Equals(user.Username))
+                        {
+                            return "User password is the same as username";
+                        }
+                        else
+                        {
+                            if (IsPhoneNumberValid(user.UserPhoneNumber))
+                            {
+                                AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+                                foreach (User userIterator in appDatabaseContext.UsersDbSet)
+                                {
+                                    if (userIterator.Username.Equals(user.Username))
+                                    {
+                                        return "The user already exists in database";
+                                    }
+                                }
+                                appDatabaseContext.UsersDbSet.Add(user);
+                                appDatabaseContext.SaveChanges();
+                                return "User added successfully";
+                            }
+                            else
+                            {
+                                return "The phone number is not valid";
+                            }
+                        }
                     }
                 }
-                catch (Exception ex)
+                else
                 {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The user could not be added");
-                    return false;
+                    return "Email not valid";
                 }
+            }
+            else
+            {
+                return "Username not valid";
             }
         }
 
-        public Boolean UpdateUser(User userToUpdate)
+        public User GetUserByEmail(User user)
         {
-            using (var db = new AppDatabaseContext())
+            AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+            foreach (User userIterator in appDatabaseContext.UsersDbSet)
             {
-                try
+                Debug.WriteLine("=======================================> Checking user " + userIterator.Username + " " + userIterator.UserEmail);
+                if (userIterator.UserEmail.Equals(user.UserEmail))
                 {
-                    if (userToUpdate == null)
-                    {
-                        System.Diagnostics.Debug.WriteLine("DECLINED => The user received is null");
-                        return false;
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Trying to update the user");
-                        db.UsersDbSet.Update(userToUpdate);
-                        db.SaveChanges();
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => The user was updated. Saving changes...");
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Done");
-                        return true;
-                    }
-                }
-                catch (Exception e)
-                {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The user could not be updated");
-                    return false;
+                    Debug.WriteLine("=======================================> The user has been found " + userIterator.Username);
+                    return userIterator;
                 }
             }
+            return null;
+        }
+
+        public Boolean DeleteUserByUsername(User user)
+        {
+            AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+            foreach (User userIterator in appDatabaseContext.UsersDbSet)
+            {
+                Debug.WriteLine("=======================================> Checking user " + userIterator.Username + " " + userIterator.UserEmail);
+                if (userIterator.Username.Equals(user.Username))
+                {
+                    Debug.WriteLine("=======================================> The user " + userIterator.Username + " has been found and will be deleted");
+                    appDatabaseContext.UsersDbSet.Remove(userIterator);
+                    return true;
+                }
+            }
+            return false;
         }
 
         public Boolean IsPasswordValid(string passwordToCheck, string userName)
@@ -166,81 +274,118 @@ namespace Gourmet.Database
             }
         }
 
-        public Boolean IsEmailValid(String emailToCheck)
+        private Boolean IsUsernameValid(string username)
         {
-            using (var db = new AppDatabaseContext())
+            if (String.IsNullOrEmpty(username) || username.Length > 15)
             {
-                List<User> usersList = GetUsersList();
-
-                foreach (User user in usersList)
-                {
-                    if (user.UserEmail == emailToCheck)
-                    {
-                        System.Diagnostics.Debug.WriteLine("DECLINED => There is already a user with the email : " + emailToCheck + " in database");
-                        return false;
-                    }
-                }
-
-                if (IsEmailCorrectWritten(emailToCheck))
-                {
-                    System.Diagnostics.Debug.WriteLine("ACCEPTED => The email is valid");
-                    return true;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The email : " + emailToCheck + " is not correct written");
-                    return false;
-                }
+                return false;
+            }
+            else if (username.Contains("@") ||
+                    username.Contains("#") ||
+                    username.Contains("$") ||
+                    username.Contains("%") ||
+                    username.Contains("!") ||
+                    username.Contains("&") ||
+                    username.Contains("*") ||
+                    username.Contains("+") ||
+                    username.Contains("=") ||
+                    username.Contains("?") ||
+                    username.Contains("^") ||
+                    username.Contains(";") ||
+                    username.Contains(":") ||
+                    username.Contains("]") ||
+                    username.Contains("[") ||
+                    username.Contains("~") ||
+                    username.Contains(",") ||
+                    username.Contains("`") ||
+                    username.Contains("<") ||
+                    username.Contains(">") ||
+                    username.Contains("|"))
+            {
+                return false;
+            }
+            else if (IsAllWhitespaces(username))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
             }
         }
 
-        public Boolean DeleteUserByUsername(String username)
+        private Boolean IsEmailValid(string email)
         {
-            using (var db = new AppDatabaseContext())
+            Debug.WriteLine("=======================================> EMAIL IS : " + email);
+            if (String.IsNullOrEmpty(email))
             {
-                try
+                Debug.WriteLine("=======================================> EMAIL is empty");
+                return false;
+            }
+            else
+            {
+                if (email.Contains("@"))
                 {
-                    System.Diagnostics.Debug.WriteLine("ACCEPTED => Trying to remove a user...");
-                    User userToDelete = GetUserByUsername(username);
-                    if (userToDelete != null)
+                    if (email.Contains("com") || email.Contains("net") || email.Contains("ro"))
                     {
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Found the user with username : " + username);
-                        db.Remove(userToDelete);
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => The user was removed. Saving changes...");
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Done");
-                        return db.SaveChanges() >= 1;
+                        if (email.Contains("gmail") || email.Contains("yahoo") || email.Contains("outlook") || email.Contains("hotmail"))
+                        {
+                            return true;
+
+                        }
+                        else
+                        {
+                            Debug.WriteLine("=======================================> EMAIL does not contains gmail, yahoo, outlook, hotmail");
+                            return false;
+                        }
                     }
                     else
                     {
-                        System.Diagnostics.Debug.WriteLine("DECLINED => The user is null and could not be removed");
+                        Debug.WriteLine("=======================================> EMAIL does not contains .com, .net, .ro");
                         return false;
                     }
-
                 }
-                catch (Exception e)
+                else
                 {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The user with username " + username + " could not be found or could not be removed");
+                    Debug.WriteLine("=======================================> EMAIL does not contain @");
                     return false;
                 }
             }
         }
 
-        public Boolean IsUsernameValid(String usernameToCheck)
+        private Boolean IsAllWhitespaces(string str)
         {
-            using (var db = new AppDatabaseContext())
+            int aux = 0;
+            foreach (char c in str)
             {
-                List<User> usersList = GetUsersList();
-
-                foreach (User user in usersList)
+                if (char.IsWhiteSpace(c))
                 {
-                    if (user.Username == usernameToCheck)
+                    aux++;
+                }
+            }
+            return aux == str.Length;
+        }
+
+        private Boolean IsPhoneNumberValid(string phoneNumber)
+        {
+            Debug.WriteLine("=======================================> Phone number is " + phoneNumber);
+            int aux = 0;
+            if (phoneNumber.Length == 10)
+            {
+                foreach (char c in phoneNumber)
+                {
+                    if (char.IsDigit(c))
                     {
-                        System.Diagnostics.Debug.WriteLine("DECLINED => There is already a user with the username : " + usernameToCheck + " in database");
-                        return false;
+                        aux++;
                     }
                 }
-                System.Diagnostics.Debug.WriteLine("ACCEPTED => The username is valid");
-                return true;
+                Debug.WriteLine("=======================================> The number of chars (aux) is " + aux.ToString());
+                return aux == phoneNumber.Length;
+            }
+            else
+            {
+                Debug.WriteLine("=======================================> Phone does not have 10 chars");
+                return false;
             }
         }
     }

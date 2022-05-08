@@ -8,53 +8,117 @@ namespace Gourmet.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-
-        private Database.ProductsRepository productsRepository;
-
-        public ProductsController(ProductsRepository productsRepository)
+        ProductsRepository productsRepository;
+        const string DECLINED = "The product could not be found";
+        [HttpGet]
+        [Route("findProductByName")]
+        public string GetProductByName([FromBody] Product product)
         {
-            this.productsRepository = productsRepository;
+            if (productsRepository == null)
+            {
+                productsRepository = new ProductsRepository();
+            }
+            Product productToBeReturned = productsRepository.GetProductByName(product.ProductName);
+            if (productToBeReturned != null)
+            {
+                return productToBeReturned.ToString();
+            }
+            else
+            {
+                return DECLINED;
+            }
         }
 
-        public List<Product> GetProductsAsList()
+        [HttpGet]
+        [Route("findProductById")]
+        public string GetProductById([FromBody] Product product)
         {
-            return productsRepository.GetProductsList();
+            if (productsRepository == null)
+            {
+                productsRepository = new ProductsRepository();
+            }
+            Product productToBeReturned = productsRepository.GetProductById(product.ProductId);
+            if (productToBeReturned != null)
+            {
+                return productToBeReturned.ToString();
+            }
+            else
+            {
+                return DECLINED;
+            }
         }
 
-        public Product GetProductById(int productId)
+        [HttpGet]
+        [Route("getAllProducts")]
+        public string GetAllProducts()
         {
-            return productsRepository.GetProductById(productId);
+            if (productsRepository == null)
+            {
+                productsRepository = new ProductsRepository();
+            }
+            return productsRepository.GetProductsList().ToString();
+
         }
 
-        public Product GetProductByName(String productName)
+        [HttpGet]
+        [Route("getProductPrice")]
+        public string GetProductPrice(Product product)
         {
-            return productsRepository.GetProductByName(productName);
+            if (productsRepository == null)
+            {
+                productsRepository = new ProductsRepository();
+            }
+            double price = productsRepository.GetProductPrice(product.ProductId);
+            if (price == -1)
+            {
+                return DECLINED;
+            }
+            else
+            {
+                return price.ToString();
+            }
+
         }
 
-        public void CreateProduct(Product product)
+        [HttpGet]
+        [Route("getProductQuantity")]
+        public string GetProductQuantity(Product product)
         {
-            productsRepository.CreateProduct(product);
+            if (productsRepository == null)
+            {
+                productsRepository = new ProductsRepository();
+            }
+            int quantity = productsRepository.GetProductQuantity(product.ProductId);
+            if (quantity == -1)
+            {
+                return DECLINED;
+            }
+            else
+            {
+                return quantity.ToString();
+            }
         }
 
-        public void UpdateProduct(Product productToUpdate)
+        [HttpPut]
+        [Route("decreaseProductQuantity")]
+        public string DecreaseProductQuantity(Product product)
         {
-            productsRepository.UpdateProduct(productToUpdate);
+            if (productsRepository == null)
+            {
+                productsRepository = new ProductsRepository();
+            }
+            return productsRepository.DecreaseProductQuantity(product.ProductId);
         }
 
-        public void DeleteProduct(int productId)
+        [HttpPut]
+        [Route("increaseProductQuantity")]
+        public string IncreaseProductQuantity(Product product)
         {
-            productsRepository.DeleteProduct(productId);
+            if (productsRepository == null)
+            {
+                productsRepository = new ProductsRepository();
+            }
+            return productsRepository.IncreaseProductQuantity(product.ProductId);
         }
-
-        public int GetProductQuantity(int productId)
-        {
-            return productsRepository.GetProductQuantity(productId);
-        }
-
-        public void SetProductQuantity(int productId, int quantity)
-        {
-            GetProductById(productId).ProductQuantity = quantity;
-        }
-
     }
 }

@@ -1,68 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace Gourmet.Database
 {
     public class RecipesRepository
     {
-        public List<Recipe> GetRecipes()
-        {
-            using (var db = new AppDatabaseContext())
-            {
-                List<Recipe> recipes = db.RecipesDbSet.ToList();
-                if (recipes == null)
-                {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The recipes list is null. NULL will be returned");
-                    return null;
-                }
-                else if (recipes.Count == 0)
-                {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The recipes list is empty. An empty list will be returned");
-                    return recipes;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("ACCEPTED => The recipes list returned");
-                    return recipes;
-                }
-            }
-        }
-
-        public Recipe GetRecipeById(int recipeId)
-        {
-            using (var db = new AppDatabaseContext())
-            {
-                Recipe recipe = db.RecipesDbSet.FirstOrDefault(recipes => recipes.RecipeID == recipeId);
-                if (recipe == null)
-                {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The recipe is null. NULL will be returned");
-                    return null;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("ACCEPTED => The recipe with id : " + recipe.RecipeID.ToString() + " and name : " + recipe.RecipeName + " is returned");
-                    return recipe;
-                }
-            }
-        }
-
-        public Recipe GetRecipeByName(String recipeName)
-        {
-            using (var db = new AppDatabaseContext())
-            {
-                Recipe recipe = db.RecipesDbSet.FirstOrDefault(recipes => recipes.RecipeName == recipeName);
-                if (recipe == null)
-                {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The recipe is null. NULL will be returned");
-                    return null;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("ACCEPTED => The recipe with id : " + recipe.RecipeID.ToString() + " and name : " + recipe.RecipeName + " is returned");
-                    return recipe;
-                }
-            }
-        }
-
         public Boolean CreateRecipe(Recipe recipeToCreate)
         {
             using (var db = new AppDatabaseContext())
@@ -91,63 +33,99 @@ namespace Gourmet.Database
             }
         }
 
-        public Boolean UpdateRecipe(Recipe recipeToUpdate)
+        public Recipe FindRecipeById(Recipe recipe)
         {
-            using (var db = new AppDatabaseContext())
+            AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+            foreach (Recipe recipeIterator in appDatabaseContext.RecipesDbSet)
             {
-                try
+                Debug.WriteLine("=======================================> Checking recipe " + recipeIterator.RecipeName);
+                if (recipeIterator.RecipeID.Equals(recipe.RecipeID))
                 {
-                    if (recipeToUpdate == null)
-                    {
-                        System.Diagnostics.Debug.WriteLine("DECLINED => The recipe received is null");
-                        return false;
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Trying to update a recipe...");
-                        db.RecipesDbSet.Update(recipeToUpdate);
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => The recipe was updated. Saving changes...");
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Done");
-                        return db.SaveChanges() >= 1;
-                    }
+                    return recipeIterator;
                 }
-                catch (Exception e)
+            }
+            return null;
+        }
+
+        public Recipe FindRecipeByName(Recipe recipe)
+        {
+            AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+            foreach (Recipe recipeIterator in appDatabaseContext.RecipesDbSet)
+            {
+                Debug.WriteLine("=======================================> Checking recipe " + recipeIterator.RecipeName);
+                if (recipeIterator.RecipeName.Equals(recipe.RecipeName))
                 {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The recipe could not be updated");
-                    return false;
+                    return recipeIterator;
                 }
+            }
+            return null;
+        }
+
+        public string GetRecipeDescription(Recipe recipe)
+        {
+            AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+            foreach (Recipe recipeIterator in appDatabaseContext.RecipesDbSet)
+            {
+                Debug.WriteLine("=======================================> Checking recipe " + recipeIterator.RecipeName);
+                if (recipeIterator.RecipeID.Equals(recipe.RecipeID))
+                {
+                    return recipeIterator.RecipeDescription;
+                }
+            }
+            return null;
+        }
+
+        public Product GetRecipeReference(Recipe recipe)
+        {
+            AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+            foreach (Recipe recipeIterator in appDatabaseContext.RecipesDbSet)
+            {
+                Debug.WriteLine("=======================================> Checking recipe " + recipeIterator.RecipeName);
+                if (recipeIterator.RecipeID.Equals(recipe.RecipeID))
+                {
+                    return recipeIterator.RecipeProductReference;
+                }
+            }
+            return null;
+        }
+
+        public List<Recipe> GetRecipesList()
+        {
+            AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+            List<Recipe> recipesList = appDatabaseContext.RecipesDbSet.ToList();
+            if (recipesList == null)
+            {
+                Debug.WriteLine("DECLINED => The recipe list is null. NULL will be returned");
+                return null;
+            }
+            else if (recipesList.Count == 0)
+            {
+                Debug.WriteLine("DECLINED => The recipe list is empty. An empty list will be returned");
+                return recipesList;
+            }
+            else
+            {
+                Debug.WriteLine("ACCEPTED => The product list returned");
+                return recipesList;
             }
         }
 
-        public Boolean DeleteRecipe(int recipeId)
+        public Boolean DeleteRecipeById(Recipe recipe)
         {
-            using (var db = new AppDatabaseContext())
+            AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+            foreach (Recipe recipeIterator in appDatabaseContext.RecipesDbSet)
             {
-                try
+                Debug.WriteLine("=======================================> Checking recipe " + recipeIterator.RecipeName);
+                if (recipeIterator.RecipeID == recipe.RecipeID)
                 {
-                    System.Diagnostics.Debug.WriteLine("ACCEPTED => Trying to remove a recipe...");
-                    Recipe recipeToDelete = GetRecipeById(recipeId);
-                    if (recipeToDelete != null)
-                    {
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Found the recipe with id : " + recipeId.ToString() + " and it is " + recipeToDelete.RecipeName);
-                        db.Remove(recipeToDelete);
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => The recipe was removed. Saving changes...");
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Done");
-                        return db.SaveChanges() >= 1;
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("DECLINED => The recipe is null and could not be removed");
-                        return false;
-                    }
-
-                }
-                catch (Exception e)
-                {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The recipe with id " + recipeId.ToString() + " could not be found or could not be removed");
-                    return false;
+                    Debug.WriteLine("=======================================> The recipe " + recipeIterator.RecipeName + " has been found and will be deleted");
+                    appDatabaseContext.RecipesDbSet.Remove(recipeIterator);
+                    return true;
                 }
             }
+            return false;
         }
+
     }
 }
+

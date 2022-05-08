@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace Gourmet.Database
 {
@@ -30,37 +31,59 @@ namespace Gourmet.Database
 
         public Product GetProductById(int productId)
         {
-            using (var db = new AppDatabaseContext())
+            if (String.IsNullOrEmpty(productId.ToString()))
             {
-                Product product = db.ProductsDbSet.FirstOrDefault(products => products.ProductId == productId);
-                if (product == null)
-                {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The product is null. NULL will be returned");
-                    return null;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("ACCEPTED => The product with id : " + product.ProductId.ToString() + " and name : " + product.ProductName + " is returned");
-                    return product;
-                }
+                return null;
             }
+            else
+            {
+                AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+                foreach (Product productIterator in appDatabaseContext.ProductsDbSet)
+                {
+                    Debug.WriteLine("=======================================> Checking product " + productIterator.ProductName);
+                    if (productIterator.ProductId == productId)
+                    {
+                        Debug.WriteLine("=======================================> The product has been found " + productIterator.ProductName);
+                        return productIterator;
+                    }
+                }
+                return null;
+            }
+
         }
 
         public Product GetProductByName(String productName)
         {
-            using (var db = new AppDatabaseContext())
+            if (String.IsNullOrEmpty(productName))
             {
-                Product product = db.ProductsDbSet.FirstOrDefault(products => products.ProductName == productName);
-                if (product == null)
+                return null;
+            }
+            else
+            {
+                AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+                foreach (Product productIterator in appDatabaseContext.ProductsDbSet)
                 {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The product is null. NULL will be returned");
-                    return null;
+                    Debug.WriteLine("=======================================> Checking product " + productIterator.ProductName);
+                    if (productIterator.ProductName.Equals(productName))
+                    {
+                        Debug.WriteLine("=======================================> The product has been found " + productIterator.ProductName);
+                        return productIterator;
+                    }
                 }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("ACCEPTED => The product with id : " + product.ProductId.ToString() + " and name : " + product.ProductName + " is returned");
-                    return product;
-                }
+                return null;
+            }
+        }
+
+        public double GetProductPrice(int productId)
+        {
+            Product product = GetProductById(productId);
+            if (product != null)
+            {
+                return GetProductById(productId).ProductPrice;
+            }
+            else
+            {
+                return -1.0;
             }
         }
 
@@ -93,82 +116,75 @@ namespace Gourmet.Database
             }
         }
 
-        public Boolean UpdateProduct(Product productToUpdate)
+        internal string IncreaseProductQuantity(int productId)
         {
-            using (var db = new AppDatabaseContext())
+            Product product = GetProductById(productId);
+            if (product != null)
             {
-                try
-                {
-                    if (productToUpdate == null)
-                    {
-                        System.Diagnostics.Debug.WriteLine("DECLINED => The product received is null");
-                        return false;
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Trying to update a product...");
-                        db.ProductsDbSet.Update(productToUpdate);
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => The product was updated. Saving changes...");
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Done");
-                        return db.SaveChanges() >= 1;
-                    }
-                }
-                catch (Exception e)
-                {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The product could not be updated");
-                    return false;
-                }
+                changeQuantity(product, 1);
+                return "The quantity of the " + product.ProductName + " has been increased successfully";
+            }
+            else
+            {
+                return "The quantity could not be changed. The product does not exists";
             }
         }
 
-        public Boolean DeleteProduct(int productId)
+        public string DecreaseProductQuantity(int productId)
         {
-            using (var db = new AppDatabaseContext())
+            Product product = GetProductById(productId);
+            if (product != null)
             {
-                try
-                {
-                    System.Diagnostics.Debug.WriteLine("ACCEPTED => Trying to remove a product...");
-                    Product productToDelete = GetProductById(productId);
-                    if (productToDelete != null)
-                    {
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Found the product with id : " + productId.ToString() + " and it is " + productToDelete.ProductName);
-                        db.Remove(productToDelete);
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => The product was removed. Saving changes...");
-                        System.Diagnostics.Debug.WriteLine("ACCEPTED => Done");
-                        return db.SaveChanges() >= 1;
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("DECLINED => The product is null and could not be removed");
-                        return false;
-                    }
+                changeQuantity(product, -1);
+                return "The quantity of the " + product.ProductName + " has been decreased successfully";
+            }
+            else
+            {
+                return "The quantity could not be changed. The product does not exists";
+            }
+        }
 
-                }
-                catch (Exception e)
+        private void changeQuantity(Product product, int value)
+        {
+            Product productToChange = new Product();
+            AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+            productToChange.ProductId = product.ProductId;
+            productToChange.ProductQuantity = product.ProductQuantity + value;
+            productToChange.ProductPrice = product.ProductPrice;
+            productToChange.ProductName = product.ProductName;
+            productToChange.ProductImage = product.ProductImage;
+            productToChange.ProductDescription = product.ProductDescription;
+            appDatabaseContext.ProductsDbSet.Remove(product);
+            appDatabaseContext.ProductsDbSet.Add(productToChange);
+            appDatabaseContext.SaveChanges();
+        }
+
+        public Boolean DeleteProduct(Product product)
+        {
+            AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+            foreach (Product productIterator in appDatabaseContext.ProductsDbSet)
+            {
+                Debug.WriteLine("=======================================> Checking product " + productIterator.ProductName);
+                if (productIterator.ProductId.Equals(product.ProductId))
                 {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The product with id " + productId.ToString() + " could not be found or could not be removed");
-                    return false;
+                    Debug.WriteLine("=======================================> The product " + productIterator.ProductName + " has been found and will be deleted");
+                    appDatabaseContext.ProductsDbSet.Remove(productIterator);
+                    return true;
                 }
             }
+            return false;
         }
 
         public int GetProductQuantity(int productId)
         {
-            using (var db = new AppDatabaseContext())
+            Product product = GetProductById(productId);
+            if (product != null)
             {
-                System.Diagnostics.Debug.WriteLine("ACCEPTED => Finding the product with product id : " + productId.ToString());
-                Product product = GetProductById(productId);
-                if (product != null)
-                {
-                    System.Diagnostics.Debug.WriteLine("ACCEPTED => Found the product with id : " + productId.ToString() + " and it is " + product.ProductName);
-                    System.Diagnostics.Debug.WriteLine("ACCEPTED => The quantity is : " + product.ProductQuantity.ToString());
-                    return product.ProductQuantity;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("DECLINED => The product with id : " + productId.ToString() + " could not be found or is null. -1 will be returned");
-                    return -1;
-                }
+                return GetProductById(productId).ProductQuantity;
+            }
+            else
+            {
+                return -1;
             }
         }
     }
