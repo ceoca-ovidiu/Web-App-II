@@ -35,3 +35,13 @@
     scrollbar-width: none;
     max-height: 150px;
 }
+
+.card-suggestion {
+    width: 230px;
+    max-height: 500px;
+    border: solid black 1px;
+    border-radius: 10px;
+    overflow-x: hidden;
+    padding: 20px;
+    margin: 10px;
+}
