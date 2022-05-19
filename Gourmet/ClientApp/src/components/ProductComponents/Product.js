@@ -11,6 +11,12 @@ export default function Product(props) {
 
   function onClickHandle() {
     // TODO: Add to cart => create global cart storage
+    let productList = sessionStorage.getItem("productList");
+    productList === ""
+      ? (productList = [])
+      : (productList = JSON.parse(productList));
+    productList.push(props);
+    sessionStorage.setItem("productList", JSON.stringify(productList));
     alert("Item has been added to te cart");
   }
 

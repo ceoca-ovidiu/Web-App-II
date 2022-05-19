@@ -7,7 +7,6 @@ import axios from "axios";
 import Constants from "../utils/Constants";
 import { useEffect } from "react";
 import Cookies from "universal-cookie";
-import bcrypt from "bcryptjs";
 
 export default function User(props) {
   let history = useHistory();
@@ -43,7 +42,7 @@ export default function User(props) {
     phoneMatchError: false,
     phoneOldMatchError: false,
   });
-  const salt = bcrypt.genSalt(10);
+
   // useEffect(() => {
   //   let user = CookieCheck();
   //   if (user === null) {
@@ -91,9 +90,9 @@ export default function User(props) {
 
         setFromData({
           ...formData,
-          oldPassword: bcrypt.hashSync(formData.oldPassword),
-          newPassword: bcrypt.hashSync(formData.newPassword),
-          confirmPassword: bcrypt.hash(formData.confirmPassword, salt),
+          oldPassword: formData.oldPassword,
+          newPassword: formData.newPassword,
+          confirmPassword: formData.confirmPassword,
         });
         if (formData.newPassword !== formData.confirmPassword) {
           setErrors({
