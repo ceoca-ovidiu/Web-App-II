@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Gourmet.Database
@@ -38,11 +39,11 @@ namespace Gourmet.Database
                 Debug.WriteLine("=======================================> Checking user " + userIterator.Username + " " + userIterator.UserEmail);
                 if (userIterator.Username.Equals(user.Username))
                 {
-                    if (userIterator.UserPassword.Equals(user.UserPassword))
+                    if (user.UserPassword.Equals(DecodePassword(userIterator.UserPassword)))
                     {
-                        return "The user has been found";
+                        Debug.WriteLine("=======================================> Found user " + userIterator.Username + " " + userIterator.UserEmail);
+                        return userIterator.Username + "<--->" + DecodePassword(userIterator.UserPassword); // TOFIX IF NEEDED
                     }
-                    return "The password does not match";
                 }
             }
             return "The user could not be found";
@@ -125,7 +126,7 @@ namespace Gourmet.Database
                         Debug.WriteLine("=======================================> The user has been found " + userIterator.Username);
                         User userToAdd = new User();
                         userToAdd.Username = user.Username;
-                        userToAdd.UserPassword = user.UserPassword;
+                        userToAdd.UserPassword = EncodePassword(user.UserPassword);
                         userToAdd.UserEmail = userIterator.UserEmail;
                         userToAdd.UserPhoneNumber = userIterator.UserPhoneNumber;
                         appDatabaseContext.UsersDbSet.Remove(userIterator);
@@ -171,24 +172,33 @@ namespace Gourmet.Database
                         }
                         else
                         {
-                            if (IsPhoneNumberValid(user.UserPhoneNumber))
+                            if (user.UserPassword.Length >= 5)
                             {
-                                AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
-                                foreach (User userIterator in appDatabaseContext.UsersDbSet)
+                                if (IsPhoneNumberValid(user.UserPhoneNumber))
                                 {
-                                    if (userIterator.Username.Equals(user.Username))
+                                    AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+                                    foreach (User userIterator in appDatabaseContext.UsersDbSet)
                                     {
-                                        return "The user already exists in database";
+                                        if (userIterator.Username.Equals(user.Username))
+                                        {
+                                            return "The user already exists in database";
+                                        }
                                     }
+                                    user.UserPassword = EncodePassword(user.UserPassword);
+                                    appDatabaseContext.UsersDbSet.Add(user);
+                                    appDatabaseContext.SaveChanges();
+                                    return "User added successfully";
                                 }
-                                appDatabaseContext.UsersDbSet.Add(user);
-                                appDatabaseContext.SaveChanges();
-                                return "User added successfully";
+                                else
+                                {
+                                    return "The phone number is not valid";
+                                }
                             }
                             else
                             {
-                                return "The phone number is not valid";
+                                return "The password is too short";
                             }
+
                         }
                     }
                 }
@@ -201,6 +211,18 @@ namespace Gourmet.Database
             {
                 return "Username not valid";
             }
+        }
+
+        private string DecodePassword(string normalPassword)
+        {
+            var base64EncodedBytes = Convert.FromBase64String(normalPassword);
+            return Encoding.UTF8.GetString(base64EncodedBytes);
+        }
+
+        private string EncodePassword(string encodedPassword)
+        {
+            var plainTextBytes = Encoding.UTF8.GetBytes(encodedPassword);
+            return Convert.ToBase64String(plainTextBytes);
         }
 
         public User GetUserByEmail(User user)
