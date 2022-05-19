@@ -1,0 +1,50 @@
+.table-container {
+  margin-top: 15px;
+  margin-right: auto;
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.table {
+  width: 100%;
+  border: 1px solid #303030;
+}
+.table-header {
+  display: flex;
+  width: 100%;
+  background: #303030;
+  padding: 10px;
+  color: white;
+}
+.table-row {
+  display: flex;
+  width: 100%;
+  padding-top: 5px;
+  border-bottom: 2px solid #eeeeee;
+}
+.table-data {
+  flex: 1 1 20%;
+  text-align: center;
+}
+.table-data > img {
+  max-height: 30px;
+}
+.header-item {
+  flex: 1 1 20%;
+  text-align: center;
+}
+.table-data-button {
+  background-color: #303030;
+  color: white;
+  margin: 0;
+  padding: 5px;
+}
+.table-data-button:hover {
+  background-color: #4f4f4f;
+}
+
+h3 {
+  margin-bottom: 30px;
+}

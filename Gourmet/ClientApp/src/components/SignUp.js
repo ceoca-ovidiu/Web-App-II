@@ -12,6 +12,7 @@ export default function SignUp(props) {
     email: "",
     password: "",
     confirmPassword: "",
+    phone: "",
   });
 
   let userExistsError = false;
@@ -30,25 +31,25 @@ export default function SignUp(props) {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    let salt = bcrypt.genSalt(10);
     let username = stateData.username;
     let email = stateData.email;
     let password = stateData.password;
     let confirmPassword = stateData.confirmPassword;
+    let phoneNumber = stateData.phone;
     if (password === confirmPassword) {
       // this.sendCredentials(username, email, bcrypt.hashSync(password));
       passwordMatchError = false;
-      console.log(bcrypt.hashSync(password));
     } else {
       passwordMatchError = true;
     }
   }
 
-  function sendCredentials(username, email, password) {
+  function sendCredentials(username, email, password, phoneNumber) {
     let data = {
       Username: username,
       UserEmail: email,
       UserPassword: password,
+      UserPhone: phoneNumber,
     };
     axios.post(Constants.BASE_URL + Constants.SIGNUP, data).then((result) => {
       console.log(result);
@@ -121,6 +122,15 @@ export default function SignUp(props) {
               value={stateData.confirmPassword}
               type="password"
               placeholder="Confrim your password"
+              onChange={handleChange}
+              required
+            />
+            <h5>Phone number</h5>
+            <input
+              name="phoneNumber"
+              value={stateData.phone}
+              type="text"
+              placeholder="Type in your phone number"
               onChange={handleChange}
               required
             />

@@ -30,18 +30,19 @@ export default function Login(props) {
   async function handleSubmit(event) {
     event.preventDefault();
     let username = stateData.username;
-    let password = bcrypt.hashSync(stateData.password);
+    let password = stateData.password;
     console.log("YOU SUBMITTED");
     console.log(username + " and " + password);
     // this.sendCredentials(username, password);
     // TODO: send credentials and check for user => get back with a response
-    // sessionStorage.clear()
+    sessionStorage.clear();
     let userCookie = new Cookies();
     userCookie.set("user", stateData.username, {
       path: "/",
-      maxAge: 10, // given in seconds => TO BE MODIFIED
+      maxAge: 60, // given in seconds => TO BE MODIFIED
     });
     sessionStorage.setItem("username", stateData.username);
+    sessionStorage.setItem("productList", []);
     // sessionStorage.clear();
     props.toggleIsLoggedIn();
     history.push("/");
@@ -49,8 +50,10 @@ export default function Login(props) {
 
   function sendCredentials(username, password) {
     let data = {
-      username: username,
-      password: bcrypt.hashSync(password),
+      Username: username,
+      UserEmail: "",
+      UserPassword: password,
+      UserPhone: "",
     };
     axios.get(Constants.BASE_URL + Constants.LOGIN, data).then((result) => {
       switch (result) {
