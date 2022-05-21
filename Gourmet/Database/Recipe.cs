@@ -23,5 +23,8 @@ namespace Gourmet.Database
         [MaxLength(100)]
         public Product RecipeProductReference { get; set; }
 
+        [MaxLength(100)]
+        public String RecipeSuggest { get; set; }
+
     }
 }
