@@ -1,7 +1,8 @@
 ﻿using Gourmet.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
+using Gourmet.Database.Models;
+using Gourmet.Database.Repositories;
 namespace Gourmet.Controllers
 {
     [Route("api/[controller]")]
@@ -89,7 +90,7 @@ namespace Gourmet.Controllers
 
         [HttpGet]
         [Route("getAllRecipies")]
-        public string GetAllRecipies([FromBody] Recipe recipe)
+        public ActionResult<IEnumerable<Recipe>> GetAllRecipies()
         {
             if (recipesRepository == null)
             {
@@ -98,11 +99,11 @@ namespace Gourmet.Controllers
             List<Recipe> recipeList = recipesRepository.GetRecipesList();
             if (recipeList == null || recipeList.Count == 0)
             {
-                return DECLINE;
+                return null;
             }
             else
             {
-                return recipeList.ToString();
+                return recipeList;
             }
         }
 
@@ -122,7 +123,7 @@ namespace Gourmet.Controllers
             {
                 return DECLINE;
             }
-            
+
         }
 
     }

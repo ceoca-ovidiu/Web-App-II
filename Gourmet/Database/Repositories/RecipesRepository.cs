@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-
-namespace Gourmet.Database
+using Gourmet.Database.Models;
+namespace Gourmet.Database.Repositories
 {
     public class RecipesRepository
     {

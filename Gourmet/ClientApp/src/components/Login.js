@@ -13,8 +13,10 @@ export default function Login(props) {
     username: "",
     password: "",
   });
-  let wrongPasswordError = false;
-  let noUserError = false;
+  const [errors, setErrors] = useState({
+    wrongPasswordError: false,
+    noUserError: false,
+  });
   let history = useHistory();
 
   function handleChange(event) {
@@ -33,52 +35,66 @@ export default function Login(props) {
     let password = stateData.password;
     console.log("YOU SUBMITTED");
     console.log(username + " and " + password);
-    // this.sendCredentials(username, password);
+
     // TODO: send credentials and check for user => get back with a response
     sessionStorage.clear();
-    let userCookie = new Cookies();
-    userCookie.set("user", stateData.username, {
-      path: "/",
-      maxAge: 60, // given in seconds => TO BE MODIFIED
-    });
-    sessionStorage.setItem("username", stateData.username);
-    sessionStorage.setItem("productList", []);
+    sendCredentials(username, password);
+    // let userCookie = new Cookies();
+    // userCookie.set("user", stateData.username, {
+    //   path: "/",
+    //   maxAge: 60, // given in seconds => TO BE MODIFIED
+    // });
+    // sessionStorage.setItem("username", stateData.username);
+    // sessionStorage.setItem("productList", []);
     // sessionStorage.clear();
-    props.toggleIsLoggedIn();
-    history.push("/");
   }
 
   function sendCredentials(username, password) {
     let data = {
       Username: username,
-      UserEmail: "",
-      UserPassword: password,
-      UserPhone: "",
+      Password: password,
     };
-    axios.get(Constants.BASE_URL + Constants.LOGIN, data).then((result) => {
-      switch (result) {
-        case "Wrong password": {
-          wrongPasswordError = true;
-          break;
+    axios
+      .post(Constants.BASE_URL + Constants.LOGIN, data)
+      .then((result) => {
+        result = result.data;
+        console.log(result);
+        switch (result) {
+          case "Wrong password": {
+            setErrors((old) => ({
+              noUserError: false,
+              wrongPasswordError: true,
+            }));
+            break;
+          }
+          case "No user found": {
+            setErrors((old) => ({
+              wrongPasswordError: false,
+              noUserError: true,
+            }));
+            break;
+          }
+          default: {
+            setErrors((old) => ({
+              noUserError: true,
+              wrongPasswordError: true,
+            }));
+            // TODO: Redirect user to Home Page
+            let userCookie = new Cookies();
+            userCookie.set("username", result.username, {
+              path: "/",
+              maxAge: 60, // given in seconds => TO BE MODIFIED
+            });
+            sessionStorage.setItem("username", result.username);
+            props.toggleIsLoggedIn();
+            history.push("/");
+            break;
+          }
         }
-        case "No username": {
-          noUserError = true;
-          break;
-        }
-        default: {
-          wrongPasswordError = false;
-          noUserError = false;
-          // TODO: Redirect user to Home Page
-          let userCookie = new Cookies();
-          userCookie.set("user", data.username, {
-            path: "/",
-            maxAge: 10, // given in seconds => TO BE MODIFIED
-          });
-          sessionStorage.setItem("username", data.username);
-          break;
-        }
-      }
-    });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   function toSignUp() {
@@ -101,7 +117,7 @@ export default function Login(props) {
               onChange={handleChange}
               required
             ></input>
-            {noUserError && (
+            {errors.noUserError && (
               <h3 className="login--error--text">Username does not exist!</h3>
             )}
             <h5>Password</h5>
@@ -113,7 +129,7 @@ export default function Login(props) {
               onChange={handleChange}
               required
             ></input>
-            {wrongPasswordError && (
+            {errors.wrongPasswordError && (
               <h6 className="login--error--text">Wrong password!</h6>
             )}
             <div className="login--window--buttons">

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Gourmet.Database
+namespace Gourmet.Database.Models
 
 {
     public class Product

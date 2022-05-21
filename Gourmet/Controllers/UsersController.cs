@@ -1,10 +1,14 @@
 ﻿using Gourmet.Database;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-
+using Gourmet.Database.Models;
+using Gourmet.Database.Repositories;
+using Gourmet.Database.Views;
 namespace Gourmet.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -13,68 +17,82 @@ namespace Gourmet.Controllers
 
         [HttpPost]
         [Route("signup")]
-        public string SignUp([FromBody] User user)
+        public async Task<ActionResult<String>> SignUp([FromBody] UserSignUp user)
         {
             if (usersRepository == null)
             {
                 usersRepository = new UsersRepository();
             }
-            return usersRepository.SignUp(user);
+            return await usersRepository.SignUp(user);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("login")]
-        public string Login([FromBody] User user)
+        public async Task<ActionResult<User>> Login([FromBody] UserVM user)
         {
-            if (usersRepository == null)
+            if (this.usersRepository == null)
             {
-                usersRepository = new UsersRepository();
+                this.usersRepository = new UsersRepository();
             }
-            return usersRepository.Login(user);
+            var foundUser = await usersRepository.Login(user);
+            if (foundUser == null)
+            {
+                return Ok("No user found");
+            }
+            else if (foundUser.Username.Equals("wrong pass") && foundUser.UserPassword.Equals("wrong pass"))
+            {
+                return Ok("Wrong password");
+            }
+            return Ok(foundUser);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("user")]
-        public User GetUser([FromBody] User user)
+        public async Task<ActionResult<User>> GetUser([FromBody] UserName user)
         {
             if (usersRepository == null)
             {
                 usersRepository = new UsersRepository();
             }
-            return usersRepository.GetUser(user);
+            var found = await usersRepository.GetUser(user.Username);
+            if (found == null)
+            {
+                return Ok("No user found");
+            }
+            return Ok(found);
         }
 
-        [HttpPut]
+        [HttpPost]
         [Route("changePassword")]
-        public string ChangePassword([FromBody] User user)
+        public async Task<ActionResult<string>> ChangePassword([FromBody] UserSignUp user)
         {
             if (usersRepository == null)
             {
                 usersRepository = new UsersRepository();
             }
-            return usersRepository.ChangePassword(user);
+            return Ok(await usersRepository.ChangePassword(user));
         }
 
-        [HttpPut]
+        [HttpPost]
         [Route("changeEmail")]
-        public string ChangeEmail([FromBody] User user)
+        public async Task<ActionResult<string>> ChangeEmail([FromBody] UserSignUp user)
         {
             if (usersRepository == null)
             {
                 usersRepository = new UsersRepository();
             }
-            return usersRepository.ChangeEmail(user);
+            return Ok(await usersRepository.ChangeEmail(user));
         }
 
-        [HttpPut]
+        [HttpPost]
         [Route("changePhone")]
-        public string ChangePhone([FromBody] User user)
+        public async Task<ActionResult<string>> ChangePhone([FromBody] UserSignUp user)
         {
             if (usersRepository == null)
             {
                 usersRepository = new UsersRepository();
             }
-            return usersRepository.ChangePhone(user);
+            return Ok(await usersRepository.ChangePhone(user));
         }
 
         [HttpGet]

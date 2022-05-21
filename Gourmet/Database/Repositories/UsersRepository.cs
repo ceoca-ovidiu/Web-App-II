@@ -5,8 +5,11 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using Gourmet.Database.Models;
+using Gourmet.Database.Views;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Gourmet.Database
+namespace Gourmet.Database.Repositories
 {
     public class UsersRepository
     {
@@ -31,7 +34,7 @@ namespace Gourmet.Database
             }
         }
 
-        public string Login(User user)
+        public async Task<User> Login(UserVM user)
         {
             AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
             foreach (User userIterator in appDatabaseContext.UsersDbSet)
@@ -39,19 +42,23 @@ namespace Gourmet.Database
                 Debug.WriteLine("=======================================> Checking user " + userIterator.Username + " " + userIterator.UserEmail);
                 if (userIterator.Username.Equals(user.Username))
                 {
-                    if (user.UserPassword.Equals(DecodePassword(userIterator.UserPassword)))
+                    if (user.Password.Equals(DecodePassword(userIterator.UserPassword)))
                     {
                         Debug.WriteLine("=======================================> Found user " + userIterator.Username + " " + userIterator.UserEmail);
-                        return userIterator.Username + "<--->" + DecodePassword(userIterator.UserPassword); // TOFIX IF NEEDED
+                        return userIterator;
+                    }
+                    else
+                    {
+                        return new User(new UserVM("wrong pass", "wrong pass"));
                     }
                 }
             }
-            return "The user could not be found";
+            return null;
         }
 
-        public string ChangeEmail(User user)
+        public async Task<ActionResult<string>> ChangeEmail(UserSignUp user)
         {
-            if (IsEmailValid(user.UserEmail))
+            if (IsEmailValid(user.Email))
             {
                 AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
                 foreach (User userIterator in appDatabaseContext.UsersDbSet)
@@ -63,25 +70,25 @@ namespace Gourmet.Database
                         User userToAdd = new User();
                         userToAdd.Username = user.Username;
                         userToAdd.UserPassword = userIterator.UserPassword;
-                        userToAdd.UserEmail = user.UserEmail;
+                        userToAdd.UserEmail = user.Email;
                         userToAdd.UserPhoneNumber = userIterator.UserPhoneNumber;
                         appDatabaseContext.UsersDbSet.Remove(userIterator);
                         appDatabaseContext.UsersDbSet.Add(userToAdd);
                         appDatabaseContext.SaveChanges();
-                        return "The user email has been updated successfully";
+                        return "Succes";
                     }
                 }
-                return "Could not update user email";
+                return "Failed";
             }
             else
             {
-                return "The email is not valid";
+                return "Email not valid";
             }
         }
 
-        public string ChangePhone(User user)
+        public async Task<ActionResult<string>> ChangePhone(UserSignUp user)
         {
-            if (IsPhoneNumberValid(user.UserPhoneNumber))
+            if (IsPhoneNumberValid(user.Phone))
             {
                 AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
                 foreach (User userIterator in appDatabaseContext.UsersDbSet)
@@ -94,26 +101,26 @@ namespace Gourmet.Database
                         userToAdd.Username = user.Username;
                         userToAdd.UserPassword = userIterator.UserPassword;
                         userToAdd.UserEmail = userIterator.UserEmail;
-                        userToAdd.UserPhoneNumber = user.UserPhoneNumber;
+                        userToAdd.UserPhoneNumber = user.Phone;
                         appDatabaseContext.UsersDbSet.Remove(userIterator);
                         appDatabaseContext.UsersDbSet.Add(userToAdd);
                         appDatabaseContext.SaveChanges();
-                        return "The user phone number has been updated successfully";
+                        return "Succes";
                     }
                 }
-                return "Could not update user phone number";
+                return "Failed";
             }
             else
             {
-                return "The phone number is not valid";
+                return "Phone number not valid";
             }
         }
 
-        public string ChangePassword(User user)
+        public async Task<ActionResult<string>> ChangePassword(UserSignUp user)
         {
-            if (user.UserPassword.Equals(user.Username) || String.IsNullOrEmpty(user.UserPassword))
+            if (user.Password.Equals(user.Username) || String.IsNullOrEmpty(user.Password))
             {
-                return "The password is the same as the username or is empty ==> ERROR";
+                return "Failed";
             }
             else
             {
@@ -126,26 +133,26 @@ namespace Gourmet.Database
                         Debug.WriteLine("=======================================> The user has been found " + userIterator.Username);
                         User userToAdd = new User();
                         userToAdd.Username = user.Username;
-                        userToAdd.UserPassword = EncodePassword(user.UserPassword);
+                        userToAdd.UserPassword = EncodePassword(user.Password);
                         userToAdd.UserEmail = userIterator.UserEmail;
                         userToAdd.UserPhoneNumber = userIterator.UserPhoneNumber;
                         appDatabaseContext.UsersDbSet.Remove(userIterator);
                         appDatabaseContext.UsersDbSet.Add(userToAdd);
                         appDatabaseContext.SaveChanges();
-                        return "The user password has been updated successfully";
+                        return "Succes";
                     }
                 }
-                return "Could not update user password";
+                return "Failed";
             }
         }
 
-        public User GetUser(User user)
+        public async Task<ActionResult<User>> GetUser(string username)
         {
             AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
             foreach (User userIterator in appDatabaseContext.UsersDbSet)
             {
                 Debug.WriteLine("=======================================> Checking user " + userIterator.Username + " " + userIterator.UserEmail);
-                if (userIterator.Username.Equals(user.Username))
+                if (userIterator.Username.Equals(username))
                 {
                     Debug.WriteLine("=======================================> The user has been found " + userIterator.Username);
                     return userIterator;
@@ -154,44 +161,44 @@ namespace Gourmet.Database
             return null;
         }
 
-        public string SignUp(User user)
+        public async Task<ActionResult<String>> SignUp(UserSignUp user)
         {
             if (IsUsernameValid(user.Username))
             {
-                if (IsEmailValid(user.UserEmail))
+                if (IsEmailValid(user.Email))
                 {
-                    if (String.IsNullOrEmpty(user.UserPassword) || String.IsNullOrEmpty(user.UserPhoneNumber))
+                    if (String.IsNullOrEmpty(user.Password) || String.IsNullOrEmpty(user.Phone))
                     {
                         return "User password or phone number empty";
                     }
                     else
                     {
-                        if (user.UserPassword.Equals(user.Username))
+                        if (user.Password.Equals(user.Username))
                         {
                             return "User password is the same as username";
                         }
                         else
                         {
-                            if (user.UserPassword.Length >= 5)
+                            if (user.Password.Length >= 5)
                             {
-                                if (IsPhoneNumberValid(user.UserPhoneNumber))
+                                if (IsPhoneNumberValid(user.Phone))
                                 {
                                     AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
                                     foreach (User userIterator in appDatabaseContext.UsersDbSet)
                                     {
                                         if (userIterator.Username.Equals(user.Username))
                                         {
-                                            return "The user already exists in database";
+                                            return "User exists";
                                         }
                                     }
-                                    user.UserPassword = EncodePassword(user.UserPassword);
-                                    appDatabaseContext.UsersDbSet.Add(user);
+                                    user.Password = EncodePassword(user.Password);
+                                    appDatabaseContext.UsersDbSet.Add(new User(user));
                                     appDatabaseContext.SaveChanges();
-                                    return "User added successfully";
+                                    return "User added";
                                 }
                                 else
                                 {
-                                    return "The phone number is not valid";
+                                    return "Phone number not valid";
                                 }
                             }
                             else
