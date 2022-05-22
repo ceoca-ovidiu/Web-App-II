@@ -12,12 +12,8 @@ export default function SignUp(props) {
     email: "",
     password: "",
     confirmPassword: "",
-    phone: "",
+    phoneNumber: "",
   });
-
-  let userExistsError = false;
-  let emailExistsError = false;
-  let passwordMatchError = false;
 
   function handleChange(event) {
     let target = event.target;
@@ -35,41 +31,41 @@ export default function SignUp(props) {
     let email = stateData.email;
     let password = stateData.password;
     let confirmPassword = stateData.confirmPassword;
-    let phoneNumber = stateData.phone;
-    if (password === confirmPassword) {
-      // this.sendCredentials(username, email, bcrypt.hashSync(password));
-      passwordMatchError = false;
+    let phoneNumber = stateData.phoneNumber;
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+    } else if (username === "") {
+      alert("Username is empty");
+    } else if (email === "") {
+      alert("Email is empty");
+    } else if (password === "") {
+      alert("Password is empty");
+    } else if (confirmPassword === "") {
+      alert("Confirm password is empty");
+    } else if (phoneNumber === "") {
+      alert("Phone number is empty");
     } else {
-      passwordMatchError = true;
+      sendCredentials(username, email, password, phoneNumber);
     }
   }
 
   function sendCredentials(username, email, password, phoneNumber) {
     let data = {
       Username: username,
-      UserEmail: email,
-      UserPassword: password,
-      UserPhone: phoneNumber,
+      Password: password,
+      Email: email,
+      Phone: phoneNumber,
     };
-    axios.post(Constants.BASE_URL + Constants.SIGNUP, data).then((result) => {
-      console.log(result);
-      switch (result) {
-        case "User exists": {
-          userExistsError = true;
-          break;
-        }
-        case "Email exists": {
-          emailExistsError = true;
-          break;
-        }
-        default: {
-          userExistsError = false;
-          emailExistsError = false;
-          break;
-          // TODO: Redirect user logged in to Home Page
-        }
-      }
-    });
+    console.log(data);
+    axios
+      .post(Constants.BASE_URL + Constants.SIGNUP, data)
+      .then((result) => {
+        alert(result.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        console.log(error.message);
+      });
   }
 
   return (
@@ -88,11 +84,6 @@ export default function SignUp(props) {
               onChange={handleChange}
               required
             />
-            {userExistsError && (
-              <h6 className="signup--error--text">
-                This username is not available!
-              </h6>
-            )}
             <h5>Email</h5>
             <input
               name="email"
@@ -102,11 +93,6 @@ export default function SignUp(props) {
               onChange={handleChange}
               required
             />
-            {emailExistsError && (
-              <h6 className="signup--error--text">
-                This email is already in use!
-              </h6>
-            )}
             <h5>Password</h5>
             <input
               name="password"
@@ -128,15 +114,12 @@ export default function SignUp(props) {
             <h5>Phone number</h5>
             <input
               name="phoneNumber"
-              value={stateData.phone}
+              value={stateData.phoneNumber}
               type="text"
               placeholder="Type in your phone number"
               onChange={handleChange}
               required
             />
-            {passwordMatchError && (
-              <h6 className="signup--error--text">Passwords do not match!</h6>
-            )}
             <div className="signup--window--buttons">
               <button type="submit" onClick={handleSubmit}>
                 Join

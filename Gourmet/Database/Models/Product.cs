@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Gourmet.Database
+namespace Gourmet.Database.Models
 
 {
     public class Product
@@ -25,7 +25,7 @@ namespace Gourmet.Database
         public string ProductDescription { get; set; } = string.Empty;
 
         [Required]
-        public byte[] ProductImage { get; set; }
+        public string ProductImage { get; set; }
 
     }
 }

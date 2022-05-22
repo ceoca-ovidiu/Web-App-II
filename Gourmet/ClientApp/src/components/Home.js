@@ -1,15 +1,13 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import Recipe from "./RecipeComponents/Recipe";
 import Suggestion from "./RecipeComponents/Suggestion";
 import image from "./RecipeComponents/MusacaCartofi.jpg";
 import axios from "axios";
 import Constants from "../utils/Constants";
-import RecipesList from "../utils/RecipesList";
-import { useState } from "react";
 import { CardImg } from "reactstrap";
 
 export default function Home(props) {
-
+     /*
      const elements = [
         {
             imageSource: image,
@@ -72,20 +70,33 @@ export default function Home(props) {
             text: "Insert text"
         }
     ];
+    */
+    const [elements, setEelements] = useState([]);
+
+    useEffect(() => {
+        axios
+            .get(Constants.BASE_URL + Constants.GET_ALL_RECIPES)
+            .then((result) => {
+                //console.log(result.data);
+                setEelements(result.data);
+            });
+    }, []);
+
+    console.log(elements);
 
         return (
             <div className="recipes-container">
-                {elements.map((element) => (
+                {elements.map((element,index) => (
                     <Fragment>
                         <Recipe
-                            imageSource={element.imageSource}
-                            name={element.name}
-                            text={element.description}
+                            key={element.recipeID}
+                            imageSource={element.recipeImage}
+                            name={element.recipeName}
+                            text={element.recipeDescription}
                         />
                         <Suggestion
-                            text={element.text}
+                            text={element.recipeSuggest}
                         />
-                        <RecipesList />
                     </Fragment>
                 ))}
  

@@ -7,7 +7,7 @@ export default function Cart(props) {
   useEffect(() => {
     let list = sessionStorage.getItem("productList");
 
-    if (list === "") {
+    if (list === "" || list === null) {
       setProductList([]);
     } else {
       list = JSON.parse(list);

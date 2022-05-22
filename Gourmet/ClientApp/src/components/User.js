@@ -10,18 +10,20 @@ import Cookies from "universal-cookie";
 
 export default function User(props) {
   let history = useHistory();
-  let userData = {
+  const [userData, setUserData] = useState({
     username: "",
-    passwprd: "",
+    password: "",
     email: "",
     phone: "",
-  };
+  });
+
   let [userFound, setUserFound] = useState(false);
   let [activeData, setActiveData] = useState({
     passwordChange: true,
     emailChange: false,
     phoneChange: false,
   });
+
   let [formData, setFromData] = useState({
     oldPassword: "",
     newPassword: "",
@@ -43,26 +45,32 @@ export default function User(props) {
     phoneOldMatchError: false,
   });
 
-  // useEffect(() => {
-  //   let user = CookieCheck();
-  //   if (user === null) {
-  //     sessionStorage.clear("username");
-  //     alert("Your session has expired, please log in again");
-  //     history.push("/login");
-  //   } else {
-  //     let data = {
-  //       Username: user,
-  //     };
-  //     axios.get(Constants.BASE_URL + Constants.USER, data).then((response) => {
-  //       if (response != "No user found") {
-  //         userData.username = user;
-  //         userData.password = response.UserPassword;
-  //         userData.email = response.UserEmail;
-  //         userData.phone = response.UserPhoneNumber;
-  //       }
-  //     });
-  //   }
-  // }, []);
+  useEffect(() => {
+    let user = CookieCheck();
+    if (user === null) {
+      sessionStorage.clear("username");
+      alert("Your session has expired, please log in again");
+      history.push("/login");
+    } else {
+      console.log(user);
+      axios
+        .post(Constants.BASE_URL + Constants.USER, { Username: user })
+        .then((response) => {
+          response = response.data.value;
+          console.log(response.UserEmail);
+          if (response !== "No user found") {
+            setUserData((old) => ({
+              username: user,
+              password: response.userPassword,
+              email: response.userEmail,
+              phone: response.userPhoneNumber,
+            }));
+          } else {
+            alert("No user found");
+          }
+        });
+    }
+  }, []);
 
   function handleChange(event) {
     let target = event.target;
@@ -72,6 +80,7 @@ export default function User(props) {
       ...formData,
       [name]: value,
     });
+    // console.log(formData);
   }
 
   function handleSubmit(event) {
@@ -82,27 +91,27 @@ export default function User(props) {
       alert("Your session has expired, please log in again");
       history.push("/login");
     } else {
-      let data = {};
+      let data = {
+        Username: userData.username,
+        Password: "",
+        Email: "",
+        Phone: "",
+      };
       let url = "";
 
       if (activeData.passwordChange) {
-        // console.log("here");
+        console.log("here");
 
-        setFromData({
-          ...formData,
-          oldPassword: formData.oldPassword,
-          newPassword: formData.newPassword,
-          confirmPassword: formData.confirmPassword,
-        });
+        // setFromData({
+        //   ...formData,
+        //   oldPassword: formData.oldPassword,
+        //   newPassword: formData.newPassword,
+        //   confirmPassword: formData.confirmPassword,
+        // });
         if (formData.newPassword !== formData.confirmPassword) {
           setErrors({
             ...errors,
             passwordMatchError: true,
-          });
-        } else if (formData.oldPassword !== userData.passwprd) {
-          setErrors({
-            ...errors,
-            passwordOldMatchError: true,
           });
         } else {
           setErrors({
@@ -112,7 +121,8 @@ export default function User(props) {
           });
 
           data = {
-            UserPassword: formData.newPassword,
+            ...data,
+            Password: formData.newPassword,
           };
           url = Constants.BASE_URL + Constants.CHANGE_PASSWORD;
         }
@@ -134,7 +144,8 @@ export default function User(props) {
             emailOldMatchError: false,
           });
           data = {
-            UserEmail: formData.newEmail,
+            ...data,
+            Email: formData.newEmail,
           };
           url = Constants.BASE_URL + Constants.CHANGE_EMAIL;
         }
@@ -158,31 +169,37 @@ export default function User(props) {
           });
 
           data = {
-            UserPhoneNumber: formData.newPhone,
+            ...data,
+            Phone: formData.newPhone,
           };
           url = Constants.BASE_URL + Constants.CHANGE_PHONE;
         }
       }
+      console.log("DATA");
       console.log(data);
+      console.log("URL");
       console.log(url);
-      // if (data && url !== "") {
-      //   axios.put(url, data).then((result) => {
-      //     if (result === "Succes") {
-      //       alert("Changes had been made!");
-      //     } else {
-      //       alert("Something went wrong, please try again later!");
-      //     }
-      //   });
-      // }
+      if (data && url !== "") {
+        axios.post(url, data).then((result) => {
+          console.log(result);
+          result = result.data.value;
+          console.log(result);
+          if (result === "Succes") {
+            alert("Changes had been made!");
+          } else {
+            alert("Something went wrong, please try again later!");
+          }
+        });
+      }
     }
   }
   return (
     <div className="main-container">
       <div className="user-data">
         <img className="user-image" src={userImage} />
-        <h5>Erovajn</h5>
-        <h5>enyedi.eervin@gmail.com</h5>
-        <h5>0738979714</h5>
+        <h5>{userData.username}</h5>
+        <h5>{userData.email}</h5>
+        <h5>{userData.phone}</h5>
       </div>
       <div className="active-data">
         <form>
@@ -192,6 +209,7 @@ export default function User(props) {
               <input
                 name="oldPassword"
                 type="text"
+                value={formData.oldPassword}
                 placeholder="Type in your old password"
                 onChange={handleChange}
               />
@@ -199,6 +217,7 @@ export default function User(props) {
               <input
                 name="newPassword"
                 type="text"
+                value={formData.newPassword}
                 placeholder="Type in your new password"
                 onChange={handleChange}
               />
@@ -206,6 +225,7 @@ export default function User(props) {
               <input
                 name="confirmPassword"
                 type="text"
+                value={formData.confirmPassword}
                 placeholder="Confirm your old password"
                 onChange={handleChange}
               />

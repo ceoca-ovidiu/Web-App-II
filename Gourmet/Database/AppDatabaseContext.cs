@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Collections;
 using System.Data;
-
+using Gourmet.Database.Models;
 namespace Gourmet.Database
 {
     public class AppDatabaseContext : DbContext

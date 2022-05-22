@@ -1,7 +1,8 @@
 ﻿using Gourmet.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
+using Gourmet.Database.Models;
+using Gourmet.Database.Repositories;
 namespace Gourmet.Controllers
 {
     [Route("api/[controller]")]
@@ -50,13 +51,13 @@ namespace Gourmet.Controllers
 
         [HttpGet]
         [Route("getAllProducts")]
-        public string GetAllProducts()
+        public ActionResult<IEnumerable<Product>> GetAllProducts()
         {
             if (productsRepository == null)
             {
                 productsRepository = new ProductsRepository();
             }
-            return productsRepository.GetProductsList().ToString();
+            return productsRepository.GetProductsList();
 
         }
 

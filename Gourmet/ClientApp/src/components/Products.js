@@ -1,93 +1,32 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import Constants from "../utils/Constants";
 import Product from "./ProductComponents/Product";
 import image from "./ProductComponents/tomato.jpg";
 
 export default function Products(props) {
   const cost = 5;
-  const elements = [
-    {
-      imageSource: image,
-      name: "Tomato",
-      description:
-        "The tomato is the edible berry of the plant Solanum lycopersicum, commonly known as the tomato plant. The species originated in western South America and Central America. The Mexican Nahuatl word tomatl gave rise to the Spanish word tomate, from which the English word tomato derived.",
-      price: 5,
-      unit: "kg",
-    },
-    {
-      imageSource: image,
-      name: "Tomato",
-      description:
-        "The tomato is the edible berry of the plant Solanum lycopersicum, commonly known as the tomato plant. The species originated in western South America and Central America. The Mexican Nahuatl word tomatl gave rise to the Spanish word tomate, from which the English word tomato derived.",
-      price: 5,
-      unit: "kg",
-    },
-    {
-      imageSource: image,
-      name: "Tomato",
-      description:
-        "The tomato is the edible berry of the plant Solanum lycopersicum, commonly known as the tomato plant. The species originated in western South America and Central America. The Mexican Nahuatl word tomatl gave rise to the Spanish word tomate, from which the English word tomato derived.",
-      price: 5,
-      unit: "kg",
-    },
-    {
-      imageSource: image,
-      name: "Tomato",
-      description:
-        "The tomato is the edible berry of the plant Solanum lycopersicum, commonly known as the tomato plant. The species originated in western South America and Central America. The Mexican Nahuatl word tomatl gave rise to the Spanish word tomate, from which the English word tomato derived.",
-      price: 5,
-      unit: "kg",
-    },
-    {
-      imageSource: image,
-      name: "Tomato",
-      description:
-        "The tomato is the edible berry of the plant Solanum lycopersicum, commonly known as the tomato plant. The species originated in western South America and Central America. The Mexican Nahuatl word tomatl gave rise to the Spanish word tomate, from which the English word tomato derived.",
-      price: 5,
-      unit: "kg",
-    },
-    {
-      imageSource: image,
-      name: "Tomato",
-      description:
-        "The tomato is the edible berry of the plant Solanum lycopersicum, commonly known as the tomato plant. The species originated in western South America and Central America. The Mexican Nahuatl word tomatl gave rise to the Spanish word tomate, from which the English word tomato derived.",
-      price: 5,
-      unit: "kg",
-    },
-    {
-      imageSource: image,
-      name: "Tomato",
-      description:
-        "The tomato is the edible berry of the plant Solanum lycopersicum, commonly known as the tomato plant. The species originated in western South America and Central America. The Mexican Nahuatl word tomatl gave rise to the Spanish word tomate, from which the English word tomato derived.",
-      price: 5,
-      unit: "kg",
-    },
-    {
-      imageSource: image,
-      name: "Tomato",
-      description:
-        "The tomato is the edible berry of the plant Solanum lycopersicum, commonly known as the tomato plant. The species originated in western South America and Central America. The Mexican Nahuatl word tomatl gave rise to the Spanish word tomate, from which the English word tomato derived.",
-      price: 5,
-      unit: "kg",
-    },
-    {
-      imageSource: image,
-      name: "Tomato",
-      description:
-        "The tomato is the edible berry of the plant Solanum lycopersicum, commonly known as the tomato plant. The species originated in western South America and Central America. The Mexican Nahuatl word tomatl gave rise to the Spanish word tomate, from which the English word tomato derived.",
-      price: 5,
-      unit: null,
-    },
-  ];
+  const [elements, setEelements] = useState([]);
 
+  useEffect(() => {
+    axios
+      .get(Constants.BASE_URL + Constants.GET_ALL_PRODUCTS)
+      .then((result) => {
+         //console.log(result.data);
+        setEelements(result.data);
+      });
+  }, []);
+
+  console.log(elements);
   return (
     <div className="products-container">
-      {elements.map((element) => (
+      {elements.map((element, index) => (
         <Product
-          key={element}
-          imageSource={element.imageSource}
-          name={element.name}
-          text={element.description}
-          price={element.price}
+          key={element.productId}
+          imageSource={element.productImage}
+          name={element.productName}
+          text={element.productDescription}
+          price={element.productPrice}
           unit={element.unit}
         />
       ))}

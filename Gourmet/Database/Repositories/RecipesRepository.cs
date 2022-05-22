@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-
-namespace Gourmet.Database
+using Gourmet.Database.Models;
+namespace Gourmet.Database.Repositories
 {
     public class RecipesRepository
     {
@@ -74,8 +74,8 @@ namespace Gourmet.Database
             }
             return null;
         }
-
-        public Product GetRecipeReference(Recipe recipe)
+        
+        public int GetRecipeReference(Recipe recipe)
         {
             AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
             foreach (Recipe recipeIterator in appDatabaseContext.RecipesDbSet)
@@ -83,16 +83,16 @@ namespace Gourmet.Database
                 Debug.WriteLine("=======================================> Checking recipe " + recipeIterator.RecipeName);
                 if (recipeIterator.RecipeID.Equals(recipe.RecipeID))
                 {
-                    return recipeIterator.RecipeProductReference;
+                    return recipeIterator.RecipeProductReferenceProductId;
                 }
             }
-            return null;
+            return 0;
         }
-
+        
         public List<Recipe> GetRecipesList()
         {
             AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
-            List<Recipe> recipesList = appDatabaseContext.RecipesDbSet.ToList();
+             List<Recipe> recipesList = appDatabaseContext.RecipesDbSet.ToList();
             if (recipesList == null)
             {
                 Debug.WriteLine("DECLINED => The recipe list is null. NULL will be returned");
