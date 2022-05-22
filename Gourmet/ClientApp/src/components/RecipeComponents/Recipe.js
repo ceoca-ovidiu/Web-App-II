@@ -8,8 +8,8 @@ export default function Recipe(props) {
   const text = props.text;
   //console.log(text);
   return (
-    <div className="card-container">
-          <img className="card-image" src={imageSource} />
+    <div className="card-container-r">
+      <img className="card-image" src={imageSource} />
       <h5 className="card-subtitle">{name}</h5>
       <h5 className="card-subtitle">Rețeta</h5>
       <p>{text}</p>
