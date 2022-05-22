@@ -7,70 +7,7 @@ import Constants from "../utils/Constants";
 import { CardImg } from "reactstrap";
 
 export default function Home(props) {
-     /*
-     const elements = [
-        {
-            imageSource: image,
-            name: "Musaca Cartofi",
-            description: "Insert recipes",
-            text: "Insert text"
-        },
-        {
-            imageSource: image,
-            name: "Musaca Cartofi",
-            description: "Insert recipes",
-            text: "Insert text"
-        },
-        {
-            imageSource: image,
-            name: "Musaca Cartofi",
-            description: "Insert recipes",
-            text: "Insert text"
-        },
-        {
-            imageSource: image,
-            name: "Musaca Cartofi",
-            description: "Insert recipes",
-            text: "Insert text"
-        },
-        {
-            imageSource: image,
-            name: "Musaca Cartofi",
-            description: "Insert recipes",
-            text: "Insert text"
-        },
-        {
-            imageSource: image,
-            name: "Musaca Cartofi",
-            description: "Insert recipes",
-            text: "Insert text"
-        },
-        {
-            imageSource: image,
-            name: "Musaca Cartofi",
-            description: "Insert recipes",
-            text: "Insert text"
-        },
-        {
-            imageSource: image,
-            name: "Musaca Cartofi",
-            description: "Insert recipes",
-            text: "Insert text"
-        },
-        {
-            imageSource: image,
-            name: "Musaca Cartofi",
-            description: "Insert recipes",
-            text: "Insert text"
-        },
-        {
-            imageSource: image,
-            name: "Musaca Cartofi",
-            description: "Insert recipes",
-            text: "Insert text"
-        }
-    ];
-    */
+
     const [elements, setEelements] = useState([]);
 
     useEffect(() => {
@@ -84,22 +21,22 @@ export default function Home(props) {
 
     console.log(elements);
 
-        return (
-            <div className="recipes-container">
-                {elements.map((element,index) => (
-                    <Fragment>
-                        <Recipe
-                            key={element.recipeID}
-                            imageSource={element.recipeImage}
-                            name={element.recipeName}
-                            text={element.recipeDescription}
-                        />
-                        <Suggestion
-                            text={element.recipeSuggest}
-                        />
-                    </Fragment>
-                ))}
- 
-            </div>
-        );
+    return (
+        <div className="recipes-container">
+            {elements.map((element, index) => (
+                <Fragment>
+                    <Recipe
+                        key={element.recipeID}
+                        imageSource={element.recipeImage}
+                        name={element.recipeName}
+                        text={element.recipeDescription}
+                    />
+                    <Suggestion
+                        text={element.recipeSuggest}
+                    />
+                </Fragment>
+            ))}
+
+        </div>
+    );
 }

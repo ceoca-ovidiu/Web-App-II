@@ -181,31 +181,38 @@ namespace Gourmet.Database.Repositories
                         {
                             if (user.Password.Length >= 5)
                             {
-                                if (IsPhoneNumberValid(user.Phone))
+                                if (IsPasswordValid(user.Password))
                                 {
-                                    AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
-                                    foreach (User userIterator in appDatabaseContext.UsersDbSet)
+                                    if (IsPhoneNumberValid(user.Phone))
                                     {
-                                        if (userIterator.Username.Equals(user.Username))
+                                        AppDatabaseContext appDatabaseContext = new AppDatabaseContext();
+                                        foreach (User userIterator in appDatabaseContext.UsersDbSet)
                                         {
-                                            return "User exists";
+                                            if (userIterator.Username.Equals(user.Username))
+                                            {
+                                                return "User exists";
+                                            }
                                         }
+                                        user.Password = EncodePassword(user.Password);
+                                        appDatabaseContext.UsersDbSet.Add(new User(user));
+                                        appDatabaseContext.SaveChanges();
+                                        return "User added";
                                     }
-                                    user.Password = EncodePassword(user.Password);
-                                    appDatabaseContext.UsersDbSet.Add(new User(user));
-                                    appDatabaseContext.SaveChanges();
-                                    return "User added";
+                                    else
+                                    {
+                                        return "Phone number not valid";
+                                    }
                                 }
                                 else
                                 {
-                                    return "Phone number not valid";
+                                    return "Password not valid";
+
                                 }
                             }
                             else
                             {
                                 return "The password is too short";
                             }
-
                         }
                     }
                 }
@@ -263,16 +270,16 @@ namespace Gourmet.Database.Repositories
             return false;
         }
 
-        public Boolean IsPasswordValid(string passwordToCheck, string userName)
+        public Boolean IsPasswordValid(string passwordToCheck)
         {
-            if (string.IsNullOrEmpty(passwordToCheck) || string.IsNullOrEmpty(userName))
+            Debug.WriteLine("ACCEPTED => Password is " + passwordToCheck);
+            if (string.IsNullOrEmpty(passwordToCheck))
             {
-                System.Diagnostics.Debug.WriteLine("DECLINED => Password or username is not correct");
+                Debug.WriteLine("DECLINED => Password or username is not correct");
                 return false;
             }
-            else if (passwordToCheck.Contains(userName))
+            else if (IsAllWhitespaces(passwordToCheck))
             {
-                System.Diagnostics.Debug.WriteLine("DECLINED => Password contains username");
                 return false;
             }
             else
@@ -309,31 +316,44 @@ namespace Gourmet.Database.Repositories
             {
                 return false;
             }
-            else if (username.Contains("@") ||
+            else if (username.Contains("`") ||
+                    username.Contains("~") ||
+                    username.Contains("!") ||
+                    username.Contains("@") ||
                     username.Contains("#") ||
                     username.Contains("$") ||
                     username.Contains("%") ||
-                    username.Contains("!") ||
+                    username.Contains("^") ||
                     username.Contains("&") ||
                     username.Contains("*") ||
+                    username.Contains("(") ||
+                    username.Contains(")") ||
+                    username.Contains("-") ||
+                    username.Contains("_") ||
                     username.Contains("+") ||
                     username.Contains("=") ||
-                    username.Contains("?") ||
-                    username.Contains("^") ||
+                    username.Contains("[") ||
+                    username.Contains("]") ||
+                    username.Contains("{") ||
+                    username.Contains("}") ||
+                    username.Contains("|") ||
                     username.Contains(";") ||
                     username.Contains(":") ||
-                    username.Contains("]") ||
-                    username.Contains("[") ||
-                    username.Contains("~") ||
-                    username.Contains(",") ||
-                    username.Contains("`") ||
+                    username.Contains("'") ||
                     username.Contains("<") ||
                     username.Contains(">") ||
-                    username.Contains("|"))
+                    username.Contains(",") ||
+                    username.Contains(".") ||
+                    username.Contains("?") ||
+                    username.Contains("/"))
             {
                 return false;
             }
             else if (IsAllWhitespaces(username))
+            {
+                return false;
+            }
+            else if (itIsNumber(username))
             {
                 return false;
             }
@@ -398,24 +418,42 @@ namespace Gourmet.Database.Repositories
         private Boolean IsPhoneNumberValid(string phoneNumber)
         {
             Debug.WriteLine("=======================================> Phone number is " + phoneNumber);
-            int aux = 0;
             if (phoneNumber.Length == 10)
             {
-                foreach (char c in phoneNumber)
+                if (itIsNumber(phoneNumber))
                 {
-                    if (char.IsDigit(c))
+                    if (phoneNumber[0] == '0' && phoneNumber[1] == '7')
                     {
-                        aux++;
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
                     }
                 }
-                Debug.WriteLine("=======================================> The number of chars (aux) is " + aux.ToString());
-                return aux == phoneNumber.Length;
+                else
+                {
+                    return false;
+                }
             }
             else
             {
                 Debug.WriteLine("=======================================> Phone does not have 10 chars");
                 return false;
             }
+        }
+
+        private Boolean itIsNumber(string passedString)
+        {
+            int aux = 0;
+            foreach (char c in passedString)
+            {
+                if (char.IsDigit(c))
+                {
+                    aux++;
+                }
+            }
+            return aux == passedString.Length;
         }
     }
 }

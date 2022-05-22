@@ -1,6 +1,6 @@
 ﻿.recipes-container {
     display: flex;
-     justify-content: space-between; 
+    justify-content: space-between;
     flex-flow: wrap;
     padding: 10px;
 }
@@ -27,7 +27,7 @@
     margin-bottom: 10px;
 }
 
-.card-container>p {
+.card-container > p {
     font-size: 10px;
     max-width: 300px;
     overflow-x: hidden;
