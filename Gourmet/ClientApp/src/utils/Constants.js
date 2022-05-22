@@ -22,7 +22,7 @@ const FIND_RECIPE_BY_ID = "findRecipeById";
 const GET_RECIPE_NAME = "getRecipeName";
 const GET_RECIPE_DESCRIPTION = "getRecipeDescription";
 const GET_RECIPE_PRODUCT_REFERENCE = "getRecipeProductReference";
-const GET_ALL_RECIPES = "getAllRecipies";
+const GET_ALL_RECIPES = "recipes/getAllRecipies";
 const DELETE_RECIPE_BY_ID = "deleteRecipeById";
 // OTHER
 const salt = "$2a$10$CwTycUXWue0Thq9StjUM0u";

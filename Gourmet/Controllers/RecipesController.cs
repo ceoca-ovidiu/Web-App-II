@@ -68,7 +68,7 @@ namespace Gourmet.Controllers
                 return recipeDescription;
             }
         }
-
+        /*
         [HttpGet]
         [Route("getRecipeProductReference")]
         public string GetRecipeProductReference([FromBody] Recipe recipe)
@@ -86,7 +86,7 @@ namespace Gourmet.Controllers
             {
                 return recipeReference.ToString();
             }
-        }
+        }*/
 
         [HttpGet]
         [Route("getAllRecipies")]

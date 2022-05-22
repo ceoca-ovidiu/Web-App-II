@@ -12,7 +12,7 @@ export default function Products(props) {
     axios
       .get(Constants.BASE_URL + Constants.GET_ALL_PRODUCTS)
       .then((result) => {
-        // console.log(result.data);
+         //console.log(result.data);
         setEelements(result.data);
       });
   }, []);

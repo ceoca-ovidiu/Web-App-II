@@ -9,22 +9,23 @@ namespace Gourmet.Database.Models
 
         [Required]
         [MaxLength(100)]
-        public string RecipeName { get; set; } = string.Empty;
+        public string RecipeName { get; set; }      
+        
+        [Required]
+        [MaxLength(100000)]
+        public string RecipeDescription { get; set; }
 
         [Required]
-        [MaxLength(100)]
-        public string RecipeDescription { get; set; } = string.Empty;
+        [MaxLength(100000)]
+        public string RecipeImage { get; set; }
+
 
         [Required]
-        [MaxLength(100)]
-        public byte[] RecipeImage { get; set; }
+        [MaxLength(100000)]
+        public int RecipeProductReferenceProductId { get; set; }
 
-        [Required]
-        [MaxLength(100)]
-        public Product RecipeProductReference { get; set; }
-
-        [MaxLength(100)]
-        public String RecipeSuggest { get; set; }
+        [MaxLength(1000000)]
+        public string RecipeSuggest { get; set; }
 
     }
 }

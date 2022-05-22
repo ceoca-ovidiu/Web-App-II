@@ -8,7 +8,6 @@ export default function Product(props) {
   const text = props.text;
   const price = props.price;
   const unit = props.unit;
-  console.log(_base64ToArrayBuffer(imageSource));
   function onClickHandle() {
     // TODO: Add to cart => create global cart storage
     let productList = sessionStorage.getItem("productList");
@@ -19,7 +18,7 @@ export default function Product(props) {
     sessionStorage.setItem("productList", JSON.stringify(productList));
     alert("Item has been added to te cart");
   }
-
+/*
   function _base64ToArrayBuffer(base64) {
     var binary_string = window.atob(base64);
     var len = binary_string.length;
@@ -29,11 +28,12 @@ export default function Product(props) {
     }
     return bytes.buffer;
   }
+  */
   return (
     <div className="card-container">
-      <img className="card-image" src={"./images/ArdeiUmpluti.jpg"} />
+          <img className="card-image" src={imageSource} />
       <h5 className="card-subtitle">{name}</h5>
-      <h5 className="card-subtitle">Descriprion</h5>
+      <h6 className="card-subtitle">Descriere</h6>
       <p>{text}</p>
       <h5 className="card-subtitle">
         Cost: {price} Ron{unit ? "/" + unit : null}

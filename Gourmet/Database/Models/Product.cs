@@ -25,7 +25,7 @@ namespace Gourmet.Database.Models
         public string ProductDescription { get; set; } = string.Empty;
 
         [Required]
-        public byte[] ProductImage { get; set; }
+        public string ProductImage { get; set; }
 
     }
 }
